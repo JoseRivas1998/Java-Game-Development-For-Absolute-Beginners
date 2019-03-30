@@ -27,7 +27,6 @@ This course will be broken into 4 different phases. The first phase is the intro
     * String Basics
     * Outputting variables to the console
     * Arithmetic operations
-    * Boolean operations
 3. Flow Control:
     * Boolean expressions
     * If statements
