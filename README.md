@@ -45,7 +45,7 @@ This course will be broken into 4 different phases. The first phase is the intro
     * List
     * HashMap
 
-### Phase 2: Clicky Bird
+### Phase 2: Clicky Plane
 
 1. Project Setup
     * Downloading libGDX setup app
@@ -55,9 +55,9 @@ This course will be broken into 4 different phases. The first phase is the intro
     * Running Game
     * The GameState and GameStateManager classes
 2. The Entity and SpriteEntity Classes
-3. The Pipe and Duel Pipe Class
+3. The Pipe and Dual Pipe Class
     * Adding a PlayState
-4. The Bird Class
+4. The Plane Class
 5. Collisions, Putting the Game Together
     * Score
     * Dying
