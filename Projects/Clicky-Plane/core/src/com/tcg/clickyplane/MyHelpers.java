@@ -25,7 +25,7 @@ public final class MyHelpers {
     }
 
     public static float mag(float x, float y) {
-        return (float) Math.sqrt(mag(x, y));
+        return (float) Math.sqrt(magSquared(x, y));
     }
 
     public static float mag(Vector2 vector2) {
