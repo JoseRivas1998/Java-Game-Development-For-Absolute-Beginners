@@ -20,7 +20,7 @@ public abstract class AbstractSpriteEntity extends AbstractEntity {
 
     private TextureRegion image;
 
-    public void setImage(TextureRegion image, boolean updateSize) {
+    protected void setImage(TextureRegion image, boolean updateSize) {
         this.image = image;
         if (updateSize) {
             imageWidth = image.getRegionWidth();
@@ -28,16 +28,30 @@ public abstract class AbstractSpriteEntity extends AbstractEntity {
         }
     }
 
-    public void setImage(TextureRegion image) {
+    protected void setImage(TextureRegion image) {
         setImage(image, true);
     }
 
-    public void setImage(Texture texture, boolean updateSize) {
+    protected void setImage(Texture texture, boolean updateSize) {
         setImage(new TextureRegion(texture), updateSize);
     }
 
-    public void setImage(Texture texture) {
+    protected void setImage(Texture texture) {
         setImage(texture, true);
+    }
+
+    protected void centerOrigin(boolean useBoundsSize) {
+        if(useBoundsSize) {
+            originX = getWidth() * .5f;
+            originY = getHeight() * .5f;
+        } else {
+            originX = imageWidth * .5f;
+            originY = imageHeight * .5f;
+        }
+    }
+
+    protected void centerOrigin() {
+        this.centerOrigin(false);
     }
 
     @Override
