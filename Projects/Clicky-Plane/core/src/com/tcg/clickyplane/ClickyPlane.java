@@ -8,11 +8,13 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.tcg.clickyplane.gamestates.GameStateType;
 import com.tcg.clickyplane.managers.GameStateManager;
+import com.tcg.clickyplane.managers.input.MyInput;
+import com.tcg.clickyplane.managers.input.MyInputProcessor;
 
 public class ClickyPlane extends ApplicationAdapter {
 
-    public static int WORLD_WIDTH = 1280;
-    public static int WORLD_HEIGHT = 720;
+    public static int WORLD_WIDTH = 800;
+    public static int WORLD_HEIGHT = 480;
 
     private GameStateManager gameStateManager;
 
@@ -20,15 +22,18 @@ public class ClickyPlane extends ApplicationAdapter {
     public void create() {
         Gdx.app.setLogLevel(Application.LOG_DEBUG);
         gameStateManager = new GameStateManager(GameStateType.PLAY);
+        Gdx.input.setInputProcessor(new MyInputProcessor());
     }
 
     @Override
     public void render() {
-        Gdx.gl.glClearColor(1, 0, 0, 1);
+        Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         float dt = Gdx.graphics.getDeltaTime();
         gameStateManager.step(dt);
+
+        MyInput.update();
 
     }
 

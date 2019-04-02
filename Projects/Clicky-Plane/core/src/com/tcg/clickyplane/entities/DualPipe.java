@@ -12,6 +12,7 @@ public class DualPipe extends AbstractEntity {
 
     private Pipe top;
     private Pipe bottom;
+    private boolean gotPoint;
 
     public DualPipe() {
         super();
@@ -20,8 +21,18 @@ public class DualPipe extends AbstractEntity {
         top = new Pipe(topY, Pipe.PipeType.TOP);
         bottom = new Pipe(topY - SPACE_BETWEEN_PIPES, Pipe.PipeType.BOTTOM);
 
+        gotPoint = false;
+
         setSize(top.getSize());
 
+    }
+
+    public void point() {
+        gotPoint = true;
+    }
+
+    public boolean hasGotPoint() {
+        return gotPoint;
     }
 
     @Override
@@ -41,6 +52,17 @@ public class DualPipe extends AbstractEntity {
     public void dispose() {
         top.dispose();
         bottom.dispose();
+    }
+
+
+    @Override
+    public float getX() {
+        return top.getX();
+    }
+
+    @Override
+    public float getY() {
+        return top.getY();
     }
 
     @Override

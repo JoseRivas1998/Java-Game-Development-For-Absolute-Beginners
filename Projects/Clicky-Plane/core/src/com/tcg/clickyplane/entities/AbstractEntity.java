@@ -28,6 +28,7 @@ public abstract class AbstractEntity implements Disposable {
     }
 
     public abstract void update(float dt);
+
     public abstract void draw(float dt, SpriteBatch sb, ShapeRenderer sr);
 
     public float getX() {
@@ -57,6 +58,35 @@ public abstract class AbstractEntity implements Disposable {
 
     public void setPosition(Vector2 point) {
         setPosition(point.x, point.y);
+    }
+
+    public float getCenterX() {
+        return getX() + (getWidth() * .5f);
+    }
+
+    public void setCenterX(float x) {
+        setX(x - (getWidth() * .5f));
+    }
+
+    public float getCenterY() {
+        return getY() + (getHeight() * .5f);
+    }
+
+    public void setCenterY(float y) {
+        setY(y - (getHeight() * .5f));
+    }
+
+    public void setCenter(float x, float y) {
+        setCenterX(x);
+        setCenterY(y);
+    }
+
+    public void setCenter(Vector2 center) {
+        setCenter(center.x, center.y);
+    }
+
+    public Vector2 getCenter() {
+        return new Vector2(getCenterX(), getCenterY());
     }
 
     public float getWidth() {
@@ -172,7 +202,7 @@ public abstract class AbstractEntity implements Disposable {
     @Override
     public boolean equals(Object obj) {
         boolean result = false;
-        if(obj == null || obj.getClass() != this.getClass()) {
+        if (obj == null || obj.getClass() != this.getClass()) {
             result = true;
         } else {
             AbstractEntity other = (AbstractEntity) obj;

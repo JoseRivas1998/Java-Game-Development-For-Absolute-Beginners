@@ -30,7 +30,7 @@ public class GameStateManager implements Disposable {
         try {
             currentState = (AbstractGameState) ClassReflection.getConstructor(gameStateType.stateClass, GameStateManager.class).newInstance(this);
         } catch (ReflectionException e) {
-            throw new GdxRuntimeException("Game state " + gameStateType + " could not be created.");
+            throw new GdxRuntimeException("Game state " + gameStateType + " could not be created.", e);
         }
     }
 

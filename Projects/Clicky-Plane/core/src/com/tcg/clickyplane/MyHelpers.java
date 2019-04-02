@@ -1,5 +1,7 @@
 package com.tcg.clickyplane;
 
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 
@@ -46,6 +48,14 @@ public final class MyHelpers {
 
     public static float dist(Vector2 p1, Vector2 p2) {
         return dist(p1.x, p1.y, p2.x, p2.y);
+    }
+
+    public static <T> T choose(T... choices) {
+        return choices[MathUtils.random(choices.length - 1)];
+    }
+
+    public static TextureRegion[][] splitSpriteSheet(Texture texture, int rows, int cols) {
+        return TextureRegion.split(texture, texture.getWidth() / cols, texture.getHeight() / rows);
     }
 
 }
