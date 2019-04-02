@@ -10,6 +10,8 @@ import com.tcg.clickyplane.ClickyPlane;
 import com.tcg.clickyplane.entities.DualPipe;
 import com.tcg.clickyplane.entities.Pipe;
 import com.tcg.clickyplane.entities.Plane;
+import com.tcg.clickyplane.entities.Score;
+import com.tcg.clickyplane.managers.ContentManager;
 import com.tcg.clickyplane.managers.GameStateManager;
 
 import java.util.ArrayList;
@@ -19,13 +21,14 @@ import java.util.List;
 public class PlayState extends AbstractGameState {
 
     private static final String TAG = PlayState.class.getSimpleName();
-    public static final float PIPE_SPAWN_TIME = 3.15f;
+    public static final float PIPE_SPAWN_TIME = 1f;
 
     private Viewport viewport;
     private List<DualPipe> pipes;
     private Plane plane;
     private float pipeSpawnTimer;
     private Texture background;
+    private Score score;
 
     public PlayState(GameStateManager gsm) {
         super(gsm);
@@ -35,9 +38,13 @@ public class PlayState extends AbstractGameState {
     protected void init() {
         viewport = new FitViewport(ClickyPlane.WORLD_WIDTH, ClickyPlane.WORLD_HEIGHT);
         pipes = new ArrayList<DualPipe>();
-        pipeSpawnTimer  = 0;
+        pipeSpawnTimer = 0;
         plane = new Plane();
         background = new Texture("img/background.png");
+        score = new Score();
+        score.setAlign(Score.MIDDLE_CENTER);
+        score.setFont(ContentManager.Font.SCORE);
+        score.setPosition(ClickyPlane.WORLD_WIDTH * .5f, ClickyPlane.WORLD_HEIGHT * .75f);
     }
 
     @Override
@@ -50,12 +57,13 @@ public class PlayState extends AbstractGameState {
         plane.update(dt);
         updatePipes(dt);
         spawnPipes(dt);
+        score.update(dt);
         viewport.apply(true);
     }
 
     private void spawnPipes(float dt) {
         pipeSpawnTimer += dt;
-        if(pipeSpawnTimer >= PIPE_SPAWN_TIME) {
+        if (pipeSpawnTimer >= PIPE_SPAWN_TIME) {
             pipeSpawnTimer = 0;
             pipes.add(new DualPipe());
         }
@@ -66,14 +74,14 @@ public class PlayState extends AbstractGameState {
         while (pipeIterator.hasNext()) {
             DualPipe pipe = pipeIterator.next();
             pipe.update(dt);
-            if(pipe.collidingWith(plane)) {
+            if (pipe.collidingWith(plane)) {
                 Gdx.app.debug(TAG, "HIT!");
             }
-            if(plane.getCenterX() > pipe.getCenterX() && !pipe.hasGotPoint()) {
+            if (plane.getCenterX() > pipe.getCenterX() && !pipe.hasGotPoint()) {
                 pipe.point();
-                Gdx.app.debug(TAG, "POINT!");
+                score.incrementScore();
             }
-            if(pipe.getX() + pipe.getWidth() < 0) {
+            if (pipe.getX() + pipe.getWidth() < 0) {
                 Gdx.app.debug(TAG, "Disposing pipe: " + pipe);
                 pipe.dispose();
                 pipeIterator.remove();
@@ -90,6 +98,7 @@ public class PlayState extends AbstractGameState {
             pipe.draw(dt, sb, sr);
         }
         plane.draw(dt, sb, sr);
+        score.draw(dt, sb, sr);
         sb.end();
     }
 

@@ -7,21 +7,24 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.tcg.clickyplane.gamestates.GameStateType;
+import com.tcg.clickyplane.managers.ContentManager;
 import com.tcg.clickyplane.managers.GameStateManager;
 import com.tcg.clickyplane.managers.input.MyInput;
 import com.tcg.clickyplane.managers.input.MyInputProcessor;
 
 public class ClickyPlane extends ApplicationAdapter {
 
-    public static int WORLD_WIDTH = 800;
-    public static int WORLD_HEIGHT = 480;
+    public static int WORLD_WIDTH = 1280;
+    public static int WORLD_HEIGHT = 720;
 
     private GameStateManager gameStateManager;
+    public static ContentManager content;
 
     @Override
     public void create() {
         Gdx.app.setLogLevel(Application.LOG_DEBUG);
         gameStateManager = new GameStateManager(GameStateType.PLAY);
+        content = new ContentManager();
         Gdx.input.setInputProcessor(new MyInputProcessor());
     }
 
@@ -44,6 +47,7 @@ public class ClickyPlane extends ApplicationAdapter {
 
     @Override
     public void dispose() {
+        content.dispose();
         gameStateManager.dispose();
     }
 }

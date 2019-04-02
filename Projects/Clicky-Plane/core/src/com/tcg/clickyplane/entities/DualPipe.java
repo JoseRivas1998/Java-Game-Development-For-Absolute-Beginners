@@ -8,7 +8,7 @@ import com.tcg.clickyplane.ClickyPlane;
 
 public class DualPipe extends AbstractEntity {
 
-    private static final float SPACE_BETWEEN_PIPES = 200f;
+    private static final float SPACE_BETWEEN_PIPES = 250f;
 
     private Pipe top;
     private Pipe bottom;

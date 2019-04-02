@@ -8,7 +8,7 @@ import com.tcg.clickyplane.ClickyPlane;
 public class Pipe extends AbstractEntity {
 
     public static final int TOP_HEIGHT = 73;
-    public static final float PIPE_SPEED = 100f;
+    public static final float PIPE_SPEED = 400f;
 
     private Texture top;
     private Texture body;

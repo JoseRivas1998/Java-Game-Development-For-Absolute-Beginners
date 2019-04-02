@@ -1,6 +1,5 @@
 package com.tcg.clickyplane.entities;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -15,9 +14,9 @@ public class Plane extends AbstractSpriteEntity {
 
     private static final float ANIM_SPEED = 0.05f;
 
-    private static final float GRAVITY = 450f;
-    private static final float JUMP_SPEED = 250f;
-    private static final float ANGLE_SMOOTHING = 5f;
+    private static final float GRAVITY = 1000f;
+    private static final float JUMP_SPEED = 500f;
+    private static final float ANGLE_SMOOTHING = 7f;
 
     private Texture spriteSheet;
     private Animation<TextureRegion> anim;
@@ -60,14 +59,14 @@ public class Plane extends AbstractSpriteEntity {
         float diff;
         if (getVelocityY() > 0) { // image angle should be below target angle
             if (imageAngle > targetAngle) { // only reason this would happen is angle is pointing down
-                if(imageAngle > 270) {
+                if (imageAngle > 270) {
                     diff = targetAngle + (360 - imageAngle);
                     imageAngle += diff / ANGLE_SMOOTHING;
                 }
             } else {
                 diff = targetAngle - imageAngle;
                 imageAngle += diff / ANGLE_SMOOTHING;
-                if(imageAngle > targetAngle) {
+                if (imageAngle > targetAngle) {
                     imageAngle = targetAngle;
                 }
             }
