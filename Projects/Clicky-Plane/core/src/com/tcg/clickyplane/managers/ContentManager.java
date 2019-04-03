@@ -1,14 +1,13 @@
 package com.tcg.clickyplane.managers;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.utils.Disposable;
 
-import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,7 +21,25 @@ public class ContentManager implements Disposable {
                 1f, // Border width
                 Color.BLACK, // Border color
                 2, 2, Color.BLACK // Shadow
-        );
+        ),
+        GAMEOVER_SCORE(
+                "fnt/font.ttf", // font path
+                48, // Font size in pixels
+                Color.WHITE, // Font Color
+                1f, // Border width
+                Color.BLACK, // Border color
+                2, 2, Color.BLACK // Shadow
+        ),
+        GAMEOVER_LABEL(
+                "fnt/pixeled.ttf",
+                24,
+                new Color(0xF77958FF),
+                0,
+                Color.WHITE,
+                0, 2, new Color(0xFCE5A4FF)
+
+        )
+        ;
         public final String path;
         public final int fontSize;
         public final Color fontColor;
@@ -47,21 +64,52 @@ public class ContentManager implements Disposable {
             FreeTypeFontGenerator.FreeTypeFontParameter param = new FreeTypeFontGenerator.FreeTypeFontParameter();
             param.size = this.fontSize;
             param.color = this.fontColor;
-            param.borderWidth = this.borderWidth;
-            param.borderColor = this.borderColor;
-            param.shadowOffsetX = this.shadowOffsetX;
-            param.shadowOffsetY = this.shadowOffsetY;
-            param.shadowColor = this.shadowColor;
+            if(this.borderWidth > 0) {
+                param.borderWidth = this.borderWidth;
+                param.borderColor = this.borderColor;
+            }
+            if(this.shadowOffsetX > 0 || this.shadowOffsetY > 0) {
+                param.shadowOffsetX = this.shadowOffsetX;
+                param.shadowOffsetY = this.shadowOffsetY;
+                param.shadowColor = this.shadowColor;
+            }
             return param;
         }
 
     }
 
+    public enum SoundEffect {
+        DIE("snd/sfx_die.wav"),
+        HIT("snd/sfx_hit.wav"),
+        POINT("snd/sfx_point.wav"),
+        SWOOSHING("snd/sfx_swooshing.wav"),
+        WING("snd/sfx_wing.wav"),
+        ;
+        public final String path;
+
+        SoundEffect(String path) {
+            this.path = path;
+        }
+    }
+
     private Map<Font, BitmapFont> fonts;
+    private Map<SoundEffect, Sound> sounds;
 
     private GlyphLayout gl;
 
     public ContentManager() {
+        loadFonts();
+        loadSounds();
+    }
+
+    private void loadSounds() {
+        sounds = new HashMap<SoundEffect, Sound>();
+        for (SoundEffect value : SoundEffect.values()) {
+            sounds.put(value, Gdx.audio.newSound(Gdx.files.internal(value.path)));
+        }
+    }
+
+    private void loadFonts() {
         fonts = new HashMap<Font, BitmapFont>();
         for (Font value : Font.values()) {
             FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal(value.path));
@@ -97,10 +145,47 @@ public class ContentManager implements Disposable {
         return gl.height;
     }
 
+    public void playSound(SoundEffect soundEffect) {
+        sounds.get(soundEffect).play();
+    }
+
+    public void playSound(SoundEffect soundEffect, float volume) {
+        sounds.get(soundEffect).play(volume);
+    }
+
+    public void playSound(SoundEffect soundEffect, float volume, float pitch, float pan) {
+        sounds.get(soundEffect).play(volume, pitch, pan);
+    }
+
+    public void loopSound(SoundEffect soundEffect) {
+        sounds.get(soundEffect).loop();
+    }
+
+    public void loopSound(SoundEffect soundEffect, float volume) {
+        sounds.get(soundEffect).loop(volume);
+    }
+
+    public void loopSound(SoundEffect soundEffect, float volume, float pitch, float pan) {
+        sounds.get(soundEffect).loop(volume, pitch, pan);
+    }
+
+    public void stopSound(SoundEffect soundEffect) {
+        sounds.get(soundEffect).stop();
+    }
+
+    public void stopAllSound(SoundEffect soundEffect) {
+        for (SoundEffect value : SoundEffect.values()) {
+            stopSound(value);
+        }
+    }
+
     @Override
     public void dispose() {
         for (Font value : Font.values()) {
             fonts.get(value).dispose();
+        }
+        for (SoundEffect value : SoundEffect.values()) {
+            sounds.get(value).dispose();
         }
     }
 }

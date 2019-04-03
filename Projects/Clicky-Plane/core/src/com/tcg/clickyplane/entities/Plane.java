@@ -5,9 +5,11 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.tcg.clickyplane.ClickyPlane;
 import com.tcg.clickyplane.MyHelpers;
+import com.tcg.clickyplane.managers.ContentManager;
 import com.tcg.clickyplane.managers.input.MyInput;
 
 public class Plane extends AbstractSpriteEntity {
@@ -34,10 +36,19 @@ public class Plane extends AbstractSpriteEntity {
         setCenter(ClickyPlane.WORLD_WIDTH * 0.15f, ClickyPlane.WORLD_HEIGHT * 0.5f);
     }
 
+    public void resetImageAngle() {
+        this.imageAngle = 0;
+    }
+
     public void handleInput() {
-        if (MyInput.keyCheckPressed(MyInput.CLICK)) {
-            setVelocityY(JUMP_SPEED);
+        if (MyInput.keyCheckPressed(MyInput.CLICK) && getY() < ClickyPlane.WORLD_HEIGHT - getHeight()) {
+            jump();
         }
+    }
+
+    public void jump() {
+        ClickyPlane.content.playSound(ContentManager.SoundEffect.WING);
+        setVelocityY(JUMP_SPEED);
     }
 
     @Override

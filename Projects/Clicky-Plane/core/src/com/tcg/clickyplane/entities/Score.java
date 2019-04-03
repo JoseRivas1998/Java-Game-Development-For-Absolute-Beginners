@@ -91,6 +91,10 @@ public class Score extends AbstractEntity {
         decrementScore(1);
     }
 
+    public void reset() {
+        this.score = 0;
+    }
+
     @Override
     public void dispose() {
 
