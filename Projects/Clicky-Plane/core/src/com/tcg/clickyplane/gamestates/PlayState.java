@@ -7,12 +7,10 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.tcg.clickyplane.ClickyPlane;
-import com.tcg.clickyplane.entities.DualPipe;
-import com.tcg.clickyplane.entities.Pipe;
-import com.tcg.clickyplane.entities.Plane;
-import com.tcg.clickyplane.entities.Score;
+import com.tcg.clickyplane.entities.*;
 import com.tcg.clickyplane.managers.ContentManager;
 import com.tcg.clickyplane.managers.GameStateManager;
+import com.tcg.clickyplane.ui.GameOver;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -29,6 +27,9 @@ public class PlayState extends AbstractGameState {
     private float pipeSpawnTimer;
     private Texture background;
     private Score score;
+    private boolean isAlive;
+    private Ground ground;
+    private GameOver gameOver;
 
     public PlayState(GameStateManager gsm) {
         super(gsm);
@@ -45,18 +46,31 @@ public class PlayState extends AbstractGameState {
         score.setAlign(Score.MIDDLE_CENTER);
         score.setFont(ContentManager.Font.SCORE);
         score.setPosition(ClickyPlane.WORLD_WIDTH * .5f, ClickyPlane.WORLD_HEIGHT * .75f);
+        isAlive = true;
+        ground = new Ground();
+        gameOver = new GameOver();
     }
 
     @Override
     public void handleInput(float dt) {
-        plane.handleInput();
+        if (isAlive) plane.handleInput();
     }
 
     @Override
     public void update(float dt) {
-        plane.update(dt);
-        updatePipes(dt);
-        spawnPipes(dt);
+        if (isAlive || !plane.collidingWith(ground)) {
+            plane.update(dt);
+            if (plane.collidingWith(ground)) {
+                isAlive = false;
+            }
+        }
+        if (isAlive) {
+            updatePipes(dt);
+            spawnPipes(dt);
+            ground.update(dt);
+        } else {
+            gameOver.update(dt);
+        }
         score.update(dt);
         viewport.apply(true);
     }
@@ -75,7 +89,7 @@ public class PlayState extends AbstractGameState {
             DualPipe pipe = pipeIterator.next();
             pipe.update(dt);
             if (pipe.collidingWith(plane)) {
-                Gdx.app.debug(TAG, "HIT!");
+                isAlive = false;
             }
             if (plane.getCenterX() > pipe.getCenterX() && !pipe.hasGotPoint()) {
                 pipe.point();
@@ -97,8 +111,13 @@ public class PlayState extends AbstractGameState {
         for (DualPipe pipe : pipes) {
             pipe.draw(dt, sb, sr);
         }
+        ground.draw(dt, sb, sr);
         plane.draw(dt, sb, sr);
-        score.draw(dt, sb, sr);
+        if(isAlive) {
+            score.draw(dt, sb, sr);
+        } else {
+            gameOver.draw(dt, sb);
+        }
         sb.end();
     }
 
@@ -112,6 +131,7 @@ public class PlayState extends AbstractGameState {
         for (DualPipe pipe : pipes) {
             pipe.dispose();
         }
+        gameOver.dispose();
         background.dispose();
     }
 }
