@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.tcg.clickyplane.ClickyPlane;
+import com.tcg.clickyplane.managers.ContentManager;
 
 public class Ground extends AbstractEntity {
 
@@ -12,7 +13,7 @@ public class Ground extends AbstractEntity {
 
     public Ground() {
         setPosition(0, 0);
-        ground = new Texture("img/ground_grass.png");
+        ground = ClickyPlane.content.getTexture(ContentManager.Image.GROUND_GRASS);
         setSize(ground.getWidth(), ground.getHeight());
         setVelocityX(-Pipe.PIPE_SPEED);
         drawX = 0;
@@ -37,6 +38,5 @@ public class Ground extends AbstractEntity {
 
     @Override
     public void dispose() {
-        ground.dispose();
     }
 }

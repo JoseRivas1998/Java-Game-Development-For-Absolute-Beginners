@@ -26,7 +26,7 @@ public class Plane extends AbstractSpriteEntity {
 
     public Plane() {
         super();
-        spriteSheet = new Texture("img/plane_spritesheet.png");
+        spriteSheet = ClickyPlane.content.getTexture(ContentManager.Image.PLANE_SPRITESHEET);
         TextureRegion[][] planes = MyHelpers.splitSpriteSheet(spriteSheet, 4, 3);
         TextureRegion[] frames = MyHelpers.choose(planes);
         anim = new Animation<TextureRegion>(ANIM_SPEED, frames);
@@ -106,6 +106,5 @@ public class Plane extends AbstractSpriteEntity {
 
     @Override
     public void dispose() {
-        spriteSheet.dispose();
     }
 }

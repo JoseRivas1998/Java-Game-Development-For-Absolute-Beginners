@@ -3,8 +3,10 @@ package com.tcg.clickyplane.managers;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.utils.Disposable;
 
@@ -38,8 +40,7 @@ public class ContentManager implements Disposable {
                 Color.WHITE,
                 0, 2, new Color(0xFCE5A4FF)
 
-        )
-        ;
+        );
         public final String path;
         public final int fontSize;
         public final Color fontColor;
@@ -64,11 +65,11 @@ public class ContentManager implements Disposable {
             FreeTypeFontGenerator.FreeTypeFontParameter param = new FreeTypeFontGenerator.FreeTypeFontParameter();
             param.size = this.fontSize;
             param.color = this.fontColor;
-            if(this.borderWidth > 0) {
+            if (this.borderWidth > 0) {
                 param.borderWidth = this.borderWidth;
                 param.borderColor = this.borderColor;
             }
-            if(this.shadowOffsetX > 0 || this.shadowOffsetY > 0) {
+            if (this.shadowOffsetX > 0 || this.shadowOffsetY > 0) {
                 param.shadowOffsetX = this.shadowOffsetX;
                 param.shadowOffsetY = this.shadowOffsetY;
                 param.shadowColor = this.shadowColor;
@@ -92,14 +93,46 @@ public class ContentManager implements Disposable {
         }
     }
 
+    public enum Image {
+        BACK("img/back.png"),
+        BACKGROUND("img/background.png"),
+        BUTTON("img/button.png"),
+        GROUND_GRASS("img/ground_grass.png"),
+        MEDALS("img/medals.png"),
+        PIPE_BODY("img/pipe_body.png"),
+        PIPE_TOP("img/pipe_top.png"),
+        PLANE_SPRITESHEET("img/plane_spritesheet.png"),
+        REPLAY("img/replay.png"),
+        TAP_ANIMATION("img/tapAnimation.png"),
+        TAP_LEFT("img/tapLeft.png"),
+        TAP_RIGHT("img/tapRight.png"),
+        TEXT_GAME_OVER("img/textGameOver.png"),
+        TEXT_GET_READY("img/textGetReady.png"),
+        UI_BG("img/ui_bg.png");
+        public final String path;
+
+        Image(String path) {
+            this.path = path;
+        }
+    }
+
     private Map<Font, BitmapFont> fonts;
     private Map<SoundEffect, Sound> sounds;
+    private Map<Image, Texture> textures;
 
     private GlyphLayout gl;
 
     public ContentManager() {
         loadFonts();
         loadSounds();
+        loadTextures();
+    }
+
+    private void loadTextures() {
+        textures = new HashMap<Image, Texture>();
+        for (Image value : Image.values()) {
+            textures.put(value, new Texture(value.path));
+        }
     }
 
     private void loadSounds() {
@@ -179,6 +212,14 @@ public class ContentManager implements Disposable {
         }
     }
 
+    public Texture getTexture(Image image) {
+        return textures.get(image);
+    }
+
+    public TextureRegion getTextureRegion(Image image) {
+        return new TextureRegion(getTexture(image));
+    }
+
     @Override
     public void dispose() {
         for (Font value : Font.values()) {
@@ -186,6 +227,9 @@ public class ContentManager implements Disposable {
         }
         for (SoundEffect value : SoundEffect.values()) {
             sounds.get(value).dispose();
+        }
+        for (Image value : Image.values()) {
+            textures.get(value).dispose();
         }
     }
 }

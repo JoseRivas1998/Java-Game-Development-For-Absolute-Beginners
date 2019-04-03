@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.tcg.clickyplane.ClickyPlane;
+import com.tcg.clickyplane.managers.ContentManager;
 
 public class Pipe extends AbstractEntity {
 
@@ -23,8 +24,8 @@ public class Pipe extends AbstractEntity {
         super();
         setX(ClickyPlane.WORLD_WIDTH);
 
-        top = new Texture("img/pipe_top.png");
-        body = new Texture("img/pipe_body.png");
+        top = ClickyPlane.content.getTexture(ContentManager.Image.PIPE_TOP);
+        body = ClickyPlane.content.getTexture(ContentManager.Image.PIPE_BODY);
 
         setWidth(top.getWidth());
 
@@ -81,6 +82,6 @@ public class Pipe extends AbstractEntity {
 
     @Override
     public void dispose() {
-        top.dispose();
+
     }
 }

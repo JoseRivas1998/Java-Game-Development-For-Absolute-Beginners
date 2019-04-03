@@ -8,6 +8,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
 import com.tcg.clickyplane.ClickyPlane;
 import com.tcg.clickyplane.MyHelpers;
+import com.tcg.clickyplane.managers.ContentManager;
 
 public class GetReady implements Disposable {
 
@@ -29,12 +30,12 @@ public class GetReady implements Disposable {
     private float stateTime = 0;
 
     public GetReady() {
-        getReady = new Texture("img/textGetReady.png");
-        tapAnimTexture = new Texture("img/tapAnimation.png");
+        getReady = ClickyPlane.content.getTexture(ContentManager.Image.TEXT_GET_READY);
+        tapAnimTexture = ClickyPlane.content.getTexture(ContentManager.Image.TAP_ANIMATION);
         TextureRegion[] tapAnimFrames = MyHelpers.splitSpriteSheet(tapAnimTexture, 1, 2)[0];
         tapAnim = new Animation<TextureRegion>(0.5f, tapAnimFrames);
-        tapLeft = new Texture("img/tapLeft.png");
-        tapRight = new Texture("img/tapRight.png");
+        tapLeft = ClickyPlane.content.getTexture(ContentManager.Image.TAP_LEFT);
+        tapRight = ClickyPlane.content.getTexture(ContentManager.Image.TAP_RIGHT);
 
         getReadyPos = new Vector2();
         getReadyPos.x = (ClickyPlane.WORLD_WIDTH * .5f) - (getReady.getWidth() * .5f);
@@ -77,9 +78,5 @@ public class GetReady implements Disposable {
 
     @Override
     public void dispose() {
-        getReady.dispose();
-        tapAnimTexture.dispose();
-        tapLeft.dispose();
-        tapRight.dispose();
     }
 }

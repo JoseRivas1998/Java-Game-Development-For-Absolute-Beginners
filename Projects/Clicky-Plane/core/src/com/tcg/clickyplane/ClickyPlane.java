@@ -23,8 +23,8 @@ public class ClickyPlane extends ApplicationAdapter {
     @Override
     public void create() {
         Gdx.app.setLogLevel(Application.LOG_DEBUG);
-        gameStateManager = new GameStateManager(GameStateType.PLAY);
         content = new ContentManager();
+        gameStateManager = new GameStateManager(GameStateType.TITLE);
         Gdx.input.setInputProcessor(new MyInputProcessor());
     }
 

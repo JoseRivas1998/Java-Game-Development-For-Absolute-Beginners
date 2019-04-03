@@ -47,10 +47,11 @@ public class PlayState extends AbstractGameState {
     @Override
     protected void init() {
         viewport = new FitViewport(ClickyPlane.WORLD_WIDTH, ClickyPlane.WORLD_HEIGHT);
+
         pipes = new ArrayList<DualPipe>();
         pipeSpawnTimer = 0;
         plane = new Plane();
-        background = new Texture("img/background.png");
+        background = ClickyPlane.content.getTexture(ContentManager.Image.BACKGROUND);
         score = new Score();
         score.setAlign(Score.MIDDLE_CENTER);
         score.setFont(ContentManager.Font.SCORE);
@@ -60,22 +61,16 @@ public class PlayState extends AbstractGameState {
         gameOver = new GameOver();
         started = false;
         getReady = new GetReady();
+        gameOver.setOnBack(new ClickListener() {
+            @Override
+            public void onClick() {
+                switchState(GameStateType.TITLE);
+            }
+        });
         gameOver.setOnReplay(new ClickListener() {
             @Override
             public void onClick() {
-                for (DualPipe pipe : pipes) {
-                    pipe.dispose();
-                }
-                pipes.clear();
-                pipeSpawnTimer = 0;
-                isAlive = true;
-                plane.setCenter(ClickyPlane.WORLD_WIDTH * 0.15f, ClickyPlane.WORLD_HEIGHT * 0.5f);
-                plane.setVelocity(Vector2.Zero);
-                plane.resetImageAngle();
-                score.reset();
-                gameOver.reset();
-                started = false;
-                getReady.resetAlpha();
+                switchState(GameStateType.PLAY);
             }
         });
     }
@@ -187,7 +182,6 @@ public class PlayState extends AbstractGameState {
             pipe.dispose();
         }
         gameOver.dispose();
-        background.dispose();
         getReady.dispose();
     }
 }

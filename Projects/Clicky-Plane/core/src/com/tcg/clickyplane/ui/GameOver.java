@@ -68,10 +68,10 @@ public class GameOver implements Disposable {
     }
 
     private void createButtons() {
-        button = new Texture("img/button.png");
+        button = ClickyPlane.content.getTexture(ContentManager.Image.BUTTON);
         buttonPatch = new NinePatch(button, 45, 45, 26,27);
-        back = new Texture("img/back.png");
-        replay = new Texture("img/replay.png");
+        back = ClickyPlane.content.getTexture(ContentManager.Image.BACK);
+        replay = ClickyPlane.content.getTexture(ContentManager.Image.REPLAY);
         backButton = new Rectangle();
         replayButton = new Rectangle();
         backButton.x = infoBoard.x + PADDING;
@@ -91,13 +91,13 @@ public class GameOver implements Disposable {
     }
 
     private void createMedals() {
-        medals = new Texture("img/medals.png");
+        medals = ClickyPlane.content.getTexture(ContentManager.Image.MEDALS);
         medalRegions = MyHelpers.splitSpriteSheet(medals, 1, 4)[0];
         toDraw = medalRegions[0];
     }
 
     private void createInfoBoard() {
-        infoBoardTexture = new Texture("img/ui_bg.png");
+        infoBoardTexture = ClickyPlane.content.getTexture(ContentManager.Image.UI_BG);
         infoBoardPatch = new NinePatch(infoBoardTexture, 88, 88, 88, 88);
 
         infoBoard = new Rectangle();
@@ -109,7 +109,7 @@ public class GameOver implements Disposable {
     }
 
     private void createGameOverText() {
-        gameOver = new Texture("img/textGameOver.png");
+        gameOver = ClickyPlane.content.getTexture(ContentManager.Image.TEXT_GAME_OVER);
         gameOverAlpha = 0;
         gameOverTarget = infoBoardTargetY + infoBoard.height + PADDING;
         gameOverPos = new Vector2((ClickyPlane.WORLD_WIDTH * .5f) - (gameOver.getWidth() * .5f), gameOverTarget - GAME_OVER_DIFF);
@@ -207,12 +207,6 @@ public class GameOver implements Disposable {
 
     @Override
     public void dispose() {
-        gameOver.dispose();
-        infoBoardTexture.dispose();
-        medals.dispose();
-        button.dispose();
-        back.dispose();
-        replay.dispose();
     }
 
 }

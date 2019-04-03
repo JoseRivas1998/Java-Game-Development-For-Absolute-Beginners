@@ -32,6 +32,7 @@ public class GameStateManager implements Disposable {
         } catch (ReflectionException e) {
             throw new GdxRuntimeException("Game state " + gameStateType + " could not be created.", e);
         }
+        currentState.resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
     }
 
     public void step(float dt) {
