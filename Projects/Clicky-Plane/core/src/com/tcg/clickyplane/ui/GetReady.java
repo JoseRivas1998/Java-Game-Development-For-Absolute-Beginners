@@ -20,10 +20,10 @@ public class GetReady implements Disposable {
     private Texture tapLeft;
     private Texture tapRight;
 
-    public Vector2 getReadyPos;
-    public Vector2 tapPos;
-    public Vector2 tapLeftPos;
-    public Vector2 tapRightPos;
+    private Vector2 getReadyPos;
+    private Vector2 tapPos;
+    private Vector2 tapLeftPos;
+    private Vector2 tapRightPos;
 
     private float alpha;
     private float stateTime = 0;
