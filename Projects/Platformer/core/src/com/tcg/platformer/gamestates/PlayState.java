@@ -5,10 +5,10 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
-import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.tcg.platformer.GameData;
 import com.tcg.platformer.entities.Level;
 import com.tcg.platformer.entities.Player;
 import com.tcg.platformer.managers.GameStateManager;
@@ -46,6 +46,7 @@ public class PlayState extends AbstractGameState {
     private void initPhys() {
         accumulator = 0;
         world = new World(new Vector2(0, GRAVITY), true);
+        world.setContactListener(new GameContactListener());
         b2dRenderer = new Box2DDebugRenderer();
         b2dView = new FitViewport(WORLD_WIDTH * METERS_PER_PIXEL, WORLD_HEIGHT * METERS_PER_PIXEL);
     }
@@ -96,4 +97,38 @@ public class PlayState extends AbstractGameState {
         world.dispose();
         player.dispose();
     }
+
+    class GameContactListener implements ContactListener {
+
+        private int playerFootContacts = 0;
+
+        @Override
+        public void beginContact(Contact contact) {
+            if(contact.getFixtureA().getUserData() != null && contact.getFixtureA().getUserData().equals(B2DUserData.PLAYER_FOOT)) {
+                playerFootContacts++;
+            }
+            if(contact.getFixtureB().getUserData() != null && contact.getFixtureB().getUserData().equals(B2DUserData.PLAYER_FOOT)) {
+                playerFootContacts++;
+            }
+            player.setOnGround(playerFootContacts > 0);
+        }
+
+        @Override
+        public void endContact(Contact contact) {
+            if(contact.getFixtureA().getUserData() != null && contact.getFixtureA().getUserData().equals(B2DUserData.PLAYER_FOOT)) {
+                playerFootContacts--;
+            }
+            if(contact.getFixtureB().getUserData() != null && contact.getFixtureB().getUserData().equals(B2DUserData.PLAYER_FOOT)) {
+                playerFootContacts--;
+            }
+            player.setOnGround(playerFootContacts > 0);
+        }
+
+        @Override
+        public void preSolve(Contact contact, Manifold oldManifold) {}
+
+        @Override
+        public void postSolve(Contact contact, ContactImpulse impulse) {}
+    }
+
 }

@@ -22,11 +22,14 @@ public class Player extends AbstractB2DSpriteEntity {
 
     private float stateTime;
 
+    private boolean onGround;
+
     public Player(World world, Vector2 spawnPoint) {
         super();
         initAnim();
         initB2DBody(world, spawnPoint);
         stateTime = 0;
+        onGround = true;
     }
 
     private void initAnim() {
@@ -43,8 +46,9 @@ public class Player extends AbstractB2DSpriteEntity {
         bodyDef.type = BodyDef.BodyType.DynamicBody;
         bodyDef.position.set(spawnPoint);
         body = world.createBody(bodyDef);
+        body.setUserData(this);
 
-        float bodyWidth = (imageWidth * METERS_PER_PIXEL * 0.5f) * 0.9f;
+        float bodyWidth = (imageWidth * METERS_PER_PIXEL * 0.5f) * 0.75f;
         float bodyHeight = (imageHeight * METERS_PER_PIXEL * 0.5f) * 0.9f;
 
         PolygonShape shape = new PolygonShape();
@@ -61,7 +65,7 @@ public class Player extends AbstractB2DSpriteEntity {
         // Foot fixture
         shape = new PolygonShape();
         shape.setAsBox(
-                (imageWidth * METERS_PER_PIXEL * 0.5f) * 0.9f, PLAYER_FOOT_HEIGHT * METERS_PER_PIXEL,
+                bodyWidth, PLAYER_FOOT_HEIGHT * METERS_PER_PIXEL,
                 new Vector2(0, -bodyHeight - (PLAYER_FOOT_HEIGHT * METERS_PER_PIXEL * 0.5f)),
                 0
         );
@@ -77,7 +81,7 @@ public class Player extends AbstractB2DSpriteEntity {
     }
 
     public void handleInput() {
-        if (MyInput.keyCheckPressed(MyInput.JUMP)) {
+        if (MyInput.keyCheckPressed(MyInput.JUMP) && isOnGround()) {
             body.applyForceToCenter(0, 500, true);
         }
         if (MyInput.keyCheck(MyInput.LEFT)) {
@@ -91,18 +95,36 @@ public class Player extends AbstractB2DSpriteEntity {
         }
     }
 
+    public boolean isOnGround() {
+        return onGround;
+    }
+
+    public void setOnGround(boolean onGround) {
+        this.onGround = onGround;
+    }
+
     @Override
     public void update(float dt) {
         setPosition(
                 (body.getPosition().x * PIXELS_PER_METER) - (imageWidth * .5f),
                 (body.getPosition().y * PIXELS_PER_METER) - (imageHeight * .5f)
         );
-        setSize(imageWidth, imageHeight);
-        centerOrigin(true);
     }
 
     @Override
     public void draw(float dt, SpriteBatch sb, ShapeRenderer sr) {
+        stateTime += dt;
+        if(onGround) {
+            if(Float.compare(body.getLinearVelocity().x, 0) == 0) {
+                setImage(idle);
+            } else {
+                setImage(walkAnim.getKeyFrame(stateTime, true));
+            }
+        } else {
+            setImage(jump);
+        }
+        setSize(imageWidth, imageHeight);
+        centerOrigin(true);
         super.draw(dt, sb, sr);
     }
 
