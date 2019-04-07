@@ -67,7 +67,9 @@ public class ContentManager implements Disposable {
     }
 
     public enum Image {
-        ;
+        PINK_ALIEN_WALK("img/pinkAlien_walk.png"),
+        PINK_ALIEN_STAND("img/pinkAlien_stand.png"),
+        PINK_ALIEN_JUMP("img/pinkAlien_jump.png");
         public final String path;
 
         Image(String path) {

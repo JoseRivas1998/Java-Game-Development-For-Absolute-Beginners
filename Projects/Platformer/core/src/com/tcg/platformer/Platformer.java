@@ -8,6 +8,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.tcg.platformer.gamestates.GameStateType;
 import com.tcg.platformer.managers.ContentManager;
 import com.tcg.platformer.managers.GameStateManager;
+import com.tcg.platformer.managers.input.MyInput;
+import com.tcg.platformer.managers.input.MyInputProcessor;
 
 public class Platformer extends ApplicationAdapter {
 
@@ -18,6 +20,7 @@ public class Platformer extends ApplicationAdapter {
 	public void create () {
 		content = new ContentManager();
 		gameStateManager = new GameStateManager(GameStateType.PLAY);
+		Gdx.input.setInputProcessor(new MyInputProcessor());
 	}
 
 	@Override
@@ -26,7 +29,7 @@ public class Platformer extends ApplicationAdapter {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
 		gameStateManager.step(Gdx.graphics.getDeltaTime());
-
+		MyInput.update();
 	}
 
 	@Override

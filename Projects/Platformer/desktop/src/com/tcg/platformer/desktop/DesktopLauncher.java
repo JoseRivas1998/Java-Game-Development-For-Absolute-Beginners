@@ -10,6 +10,8 @@ public class DesktopLauncher {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
 		config.width = GameData.WORLD_WIDTH;
 		config.height = GameData.WORLD_HEIGHT;
+		config.vSyncEnabled = false;
+		config.foregroundFPS = 0;
 		new LwjglApplication(new Platformer(), config);
 	}
 }

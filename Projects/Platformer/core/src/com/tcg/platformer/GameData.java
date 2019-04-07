@@ -9,7 +9,7 @@ public class GameData {
     public static final float PIXELS_PER_METER = 70f;
     public static final float METERS_PER_PIXEL = 1f / PIXELS_PER_METER;
 
-    public static final boolean DEBUG = true;
+    public static final boolean DEBUG = false;
 
     // PHYSICS CONSTANTS
     public static final float WORLD_STEP_PER_SECOND = 60f;
@@ -22,5 +22,14 @@ public class GameData {
         public static final short GROUND = 1 << 0;
         public static final short PLAYER = 1 << 1;
     }
+
+    public enum B2DUserData {
+        PLAYER_FOOT
+    }
+
+    // PLAYER CONSTANTS
+    public static final float PLAYER_ANIM_DURATION = 0.15f;
+    public static final float PLAYER_FOOT_HEIGHT = 4f;
+    public static final float PLAYER_SPEED = 2.5f;
 
 }

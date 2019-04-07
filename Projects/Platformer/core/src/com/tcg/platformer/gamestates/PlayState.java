@@ -10,6 +10,7 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.tcg.platformer.entities.Level;
+import com.tcg.platformer.entities.Player;
 import com.tcg.platformer.managers.GameStateManager;
 
 import static com.tcg.platformer.GameData.*;
@@ -24,6 +25,8 @@ public class PlayState extends AbstractGameState {
     private Level map;
     private Viewport gameView;
 
+    private Player player;
+
     public PlayState(GameStateManager gsm) {
         super(gsm);
     }
@@ -35,6 +38,9 @@ public class PlayState extends AbstractGameState {
         gameView = new FitViewport(WORLD_WIDTH, WORLD_HEIGHT);
         gameView.getCamera().position.set(WORLD_WIDTH * 0.5f, WORLD_HEIGHT * 0.5f, 0);
         gameView.getCamera().update();
+
+        player = new Player(world, map.getPlayerSpawnPosition());
+
     }
 
     private void initPhys() {
@@ -46,23 +52,14 @@ public class PlayState extends AbstractGameState {
 
     @Override
     public void handleInput(float dt) {
-        if(Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-            gameView.getCamera().position.add(-PIXELS_PER_METER * 5 * dt, 0, 0);
-        }
-        if(Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-            gameView.getCamera().position.add(PIXELS_PER_METER * 5 * dt, 0, 0);
-        }
-        if(Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
-            gameView.getCamera().position.add(0, -PIXELS_PER_METER * 5 * dt, 0);
-        }
-        if(Gdx.input.isKeyPressed(Input.Keys.UP)) {
-            gameView.getCamera().position.add(0, PIXELS_PER_METER * 5 * dt, 0);
-        }
+        player.handleInput();
     }
 
     @Override
     public void update(float dt) {
         b2dView.getCamera().position.set(gameView.getCamera().position.x * METERS_PER_PIXEL, gameView.getCamera().position.y * METERS_PER_PIXEL, 0);
+        player.update(dt);
+        gameView.getCamera().position.set(player.getCenter(), 0);
         b2dView.apply();
         gameView.apply();
         physicsStep(dt);
@@ -79,6 +76,10 @@ public class PlayState extends AbstractGameState {
     @Override
     public void draw(float dt, SpriteBatch sb, ShapeRenderer sr) {
         map.render(gameView);
+        sb.begin();
+        sb.setProjectionMatrix(gameView.getCamera().combined);
+        player.draw(dt, sb, sr);
+        sb.end();
         if(DEBUG) {
             b2dRenderer.render(world, b2dView.getCamera().combined);
         }
@@ -93,5 +94,6 @@ public class PlayState extends AbstractGameState {
     @Override
     public void dispose() {
         world.dispose();
+        player.dispose();
     }
 }

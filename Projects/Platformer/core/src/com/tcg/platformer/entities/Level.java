@@ -2,10 +2,20 @@ package com.tcg.platformer.entities;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.maps.MapLayer;
+import com.badlogic.gdx.maps.MapObject;
+import com.badlogic.gdx.maps.MapObjects;
+import com.badlogic.gdx.maps.objects.PolygonMapObject;
+import com.badlogic.gdx.maps.objects.PolylineMapObject;
+import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.math.Polygon;
+import com.badlogic.gdx.math.Polyline;
+import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.tcg.platformer.Platformer;
@@ -20,7 +30,11 @@ public class Level {
     private int tileWidth;
     private int tileHeight;
 
+    private Vector2 playerSpawnPosition;
+
     private static final String GROUND_LAYER = "ground";
+    private static final String COLLISION_LAYER = "collision";
+    private static final String START_POS_LAYER = "player_start";
 
     public Level(int level, World world) {
         ContentManager.TmxMap tmxMap = ContentManager.TmxMap.values()[level];
@@ -29,37 +43,50 @@ public class Level {
         tileHeight = Platformer.content.tileHeight(tmxMap);
         tiledMapRenderer = new OrthogonalTiledMapRenderer(tiledMap);
         loadGround(world);
+        loadStartingPosition(world);
     }
 
     private void loadGround(World world) {
-        TiledMapTileLayer layer = (TiledMapTileLayer) tiledMap.getLayers().get(GROUND_LAYER);
-        for (int row = 0; row < layer.getHeight(); row++) {
-            for (int col = 0; col < layer.getWidth(); col++) {
-                TiledMapTileLayer.Cell cell = layer.getCell(col, row);
-
-                if (cell == null || cell.getTile() == null) continue;
-
-                float x = (col * tileWidth) * METERS_PER_PIXEL;
-                float y = (row * tileHeight) * METERS_PER_PIXEL;
-                float width = tileWidth * METERS_PER_PIXEL;
-                float height = tileHeight * METERS_PER_PIXEL;
-
+        MapLayer collisionLayer = tiledMap.getLayers().get(COLLISION_LAYER);
+        MapObjects objects = collisionLayer.getObjects();
+        for (MapObject object : objects) {
+            if(object instanceof PolygonMapObject) {
+                PolygonMapObject polylineMapObject = (PolygonMapObject) object;
+                Polygon polyline = polylineMapObject.getPolygon();
+                float[] vertices = new float[polyline.getVertices().length];
+                for (int i = 0; i < vertices.length; i++) {
+                    vertices[i] = polyline.getVertices()[i] * METERS_PER_PIXEL;
+                }
                 BodyDef bodyDef = new BodyDef();
+                bodyDef.fixedRotation = true;
                 bodyDef.type = BodyDef.BodyType.StaticBody;
-                bodyDef.position.set(x + (width * 0.5f), y + (height * 0.5f));
+                bodyDef.position.set(polyline.getX() * METERS_PER_PIXEL, polyline.getY() * METERS_PER_PIXEL);
                 Body body = world.createBody(bodyDef);
 
-                PolygonShape shape = new PolygonShape();
-                shape.setAsBox(width * 0.5f, height * .5f);
+                ChainShape polygonShape = new ChainShape();
+                polygonShape.createChain(vertices);
 
                 FixtureDef fixtureDef = new FixtureDef();
-                fixtureDef.filter.categoryBits = PhysicsLayers.GROUND;
-                fixtureDef.filter.maskBits = PhysicsLayers.PLAYER;
-                fixtureDef.shape = shape;
+                fixtureDef.shape = polygonShape;
+                fixtureDef.friction = 0;
                 body.createFixture(fixtureDef);
-                shape.dispose();
+                polygonShape.dispose();
+
             }
         }
+    }
+
+    private void loadStartingPosition(World world) {
+        MapLayer startPosLayer = tiledMap.getLayers().get(START_POS_LAYER);
+        MapObjects mapObjects = startPosLayer.getObjects();
+        RectangleMapObject spawn = (RectangleMapObject) mapObjects.get(0);
+        Rectangle spawnRect = spawn.getRectangle();
+        playerSpawnPosition = new Vector2(spawnRect.x * METERS_PER_PIXEL, spawnRect.y * METERS_PER_PIXEL);
+
+    }
+
+    public Vector2 getPlayerSpawnPosition() {
+        return new Vector2(playerSpawnPosition);
     }
 
     public void render(Viewport viewport) {
