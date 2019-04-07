@@ -28,8 +28,9 @@ public class GameData {
     }
 
     // PLAYER CONSTANTS
-    public static final float PLAYER_ANIM_DURATION = 0.15f;
-    public static final float PLAYER_FOOT_HEIGHT = 4f;
-    public static final float PLAYER_SPEED = 2.5f;
+    public static final float PLAYER_ANIM_DURATION = 0.15f; // s / frame
+    public static final float PLAYER_FOOT_HEIGHT = 4f; // m
+    public static final float PLAYER_SPEED = 5f; // m/s
+    public static final float PLAYER_JUMP_FORCE = 400f; // N
 
 }

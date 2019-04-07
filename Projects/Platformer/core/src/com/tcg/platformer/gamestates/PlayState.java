@@ -5,12 +5,17 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.tcg.platformer.GameData;
+import com.tcg.platformer.MyHelpers;
 import com.tcg.platformer.entities.Level;
 import com.tcg.platformer.entities.Player;
+import com.tcg.platformer.entities.SmoothEntityFollow;
+import com.tcg.platformer.entities.TilingBackground;
+import com.tcg.platformer.managers.ContentManager;
 import com.tcg.platformer.managers.GameStateManager;
 
 import static com.tcg.platformer.GameData.*;
@@ -24,8 +29,13 @@ public class PlayState extends AbstractGameState {
 
     private Level map;
     private Viewport gameView;
+    private Viewport parallaxView;
 
     private Player player;
+
+    private SmoothEntityFollow camFollow;
+
+    private TilingBackground background;
 
     public PlayState(GameStateManager gsm) {
         super(gsm);
@@ -38,8 +48,13 @@ public class PlayState extends AbstractGameState {
         gameView = new FitViewport(WORLD_WIDTH, WORLD_HEIGHT);
         gameView.getCamera().position.set(WORLD_WIDTH * 0.5f, WORLD_HEIGHT * 0.5f, 0);
         gameView.getCamera().update();
+        parallaxView = new FitViewport(WORLD_WIDTH, WORLD_HEIGHT);
 
         player = new Player(world, map.getPlayerSpawnPosition());
+        camFollow = new SmoothEntityFollow(25f, map.getPlayerSpawnPosition(), true);
+        camFollow.setToFollow(player);
+
+        background = new TilingBackground(ContentManager.Image.LEVEL_BG, map.getTopRight().x, map.getTopRight().y);
 
     }
 
@@ -58,12 +73,21 @@ public class PlayState extends AbstractGameState {
 
     @Override
     public void update(float dt) {
-        b2dView.getCamera().position.set(gameView.getCamera().position.x * METERS_PER_PIXEL, gameView.getCamera().position.y * METERS_PER_PIXEL, 0);
-        player.update(dt);
-        gameView.getCamera().position.set(player.getCenter(), 0);
-        b2dView.apply();
-        gameView.apply();
         physicsStep(dt);
+        player.update(dt);
+        updateView();
+    }
+
+    private void updateView() {
+        camFollow.update();
+        gameView.getCamera().position.set(camFollow.getPos(), 0);
+        MyHelpers.clampCamera(gameView, Vector2.Zero, map.getTopRight());
+        parallaxView.getCamera().position.set(new Vector3(gameView.getCamera().position).scl(0.75f));
+        MyHelpers.clampCamera(parallaxView, Vector2.Zero, map.getTopRight());
+        gameView.apply();
+        parallaxView.apply();
+        b2dView.getCamera().position.set(gameView.getCamera().position.x * METERS_PER_PIXEL, gameView.getCamera().position.y * METERS_PER_PIXEL, 0);
+        b2dView.apply();
     }
 
     private void physicsStep(float dt) {
@@ -76,6 +100,10 @@ public class PlayState extends AbstractGameState {
 
     @Override
     public void draw(float dt, SpriteBatch sb, ShapeRenderer sr) {
+        sb.begin();
+        sb.setProjectionMatrix(parallaxView.getCamera().combined);
+        background.draw(sb);
+        sb.end();
         map.render(gameView);
         sb.begin();
         sb.setProjectionMatrix(gameView.getCamera().combined);
@@ -90,6 +118,7 @@ public class PlayState extends AbstractGameState {
     public void resize(int width, int height) {
         b2dView.update(width, height);
         gameView.update(width, height);
+        parallaxView.update(width, height);
     }
 
     @Override

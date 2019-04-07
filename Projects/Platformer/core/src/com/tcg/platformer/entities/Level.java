@@ -31,6 +31,7 @@ public class Level {
     private int tileHeight;
 
     private Vector2 playerSpawnPosition;
+    private Vector2 topRight;
 
     private static final String GROUND_LAYER = "ground";
     private static final String COLLISION_LAYER = "collision";
@@ -42,6 +43,7 @@ public class Level {
         tileWidth = Platformer.content.tileWidth(tmxMap);
         tileHeight = Platformer.content.tileHeight(tmxMap);
         tiledMapRenderer = new OrthogonalTiledMapRenderer(tiledMap);
+        topRight = new Vector2(Platformer.content.mapWidthPixels(tmxMap), Platformer.content.mapHeightPixels(tmxMap));
         loadGround(world);
         loadStartingPosition(world);
     }
@@ -50,29 +52,42 @@ public class Level {
         MapLayer collisionLayer = tiledMap.getLayers().get(COLLISION_LAYER);
         MapObjects objects = collisionLayer.getObjects();
         for (MapObject object : objects) {
+            float[] vertices = new float[0];
+            float x = 0;
+            float y = 0;
             if(object instanceof PolygonMapObject) {
-                PolygonMapObject polylineMapObject = (PolygonMapObject) object;
-                Polygon polyline = polylineMapObject.getPolygon();
-                float[] vertices = new float[polyline.getVertices().length];
+                PolygonMapObject polygonMapObject = (PolygonMapObject) object;
+                Polygon polygon = polygonMapObject.getPolygon();
+                vertices = new float[polygon.getVertices().length];
+                for (int i = 0; i < vertices.length; i++) {
+                    vertices[i] = polygon.getVertices()[i] * METERS_PER_PIXEL;
+                }
+                x = polygon.getX();
+                y = polygon.getY();
+            } else if(object instanceof PolylineMapObject) {
+                PolylineMapObject polylineMapObject = (PolylineMapObject) object;
+                Polyline polyline = polylineMapObject.getPolyline();
+                vertices = new float[polyline.getVertices().length];
                 for (int i = 0; i < vertices.length; i++) {
                     vertices[i] = polyline.getVertices()[i] * METERS_PER_PIXEL;
                 }
-                BodyDef bodyDef = new BodyDef();
-                bodyDef.fixedRotation = true;
-                bodyDef.type = BodyDef.BodyType.StaticBody;
-                bodyDef.position.set(polyline.getX() * METERS_PER_PIXEL, polyline.getY() * METERS_PER_PIXEL);
-                Body body = world.createBody(bodyDef);
-
-                ChainShape polygonShape = new ChainShape();
-                polygonShape.createChain(vertices);
-
-                FixtureDef fixtureDef = new FixtureDef();
-                fixtureDef.shape = polygonShape;
-                fixtureDef.friction = 0;
-                body.createFixture(fixtureDef);
-                polygonShape.dispose();
-
+                x = polyline.getX();
+                y = polyline.getY();
             }
+            BodyDef bodyDef = new BodyDef();
+            bodyDef.fixedRotation = true;
+            bodyDef.type = BodyDef.BodyType.StaticBody;
+            bodyDef.position.set(x * METERS_PER_PIXEL, y * METERS_PER_PIXEL);
+            Body body = world.createBody(bodyDef);
+
+            ChainShape polygonShape = new ChainShape();
+            polygonShape.createChain(vertices);
+
+            FixtureDef fixtureDef = new FixtureDef();
+            fixtureDef.shape = polygonShape;
+            fixtureDef.friction = 0;
+            body.createFixture(fixtureDef);
+            polygonShape.dispose();
         }
     }
 
@@ -87,6 +102,10 @@ public class Level {
 
     public Vector2 getPlayerSpawnPosition() {
         return new Vector2(playerSpawnPosition);
+    }
+
+    public Vector2 getTopRight() {
+        return new Vector2(topRight);
     }
 
     public void render(Viewport viewport) {

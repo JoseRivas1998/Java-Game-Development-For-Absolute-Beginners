@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.2" tiledversion="1.2.3" orientation="orthogonal" renderorder="right-down" width="100" height="100" tilewidth="70" tileheight="70" infinite="0" nextlayerid="4" nextobjectid="3">
+<map version="1.2" tiledversion="1.2.3" orientation="orthogonal" renderorder="right-down" width="100" height="100" tilewidth="70" tileheight="70" infinite="0" nextlayerid="4" nextobjectid="6">
  <tileset firstgid="1" source="tiles_spritesheet.tsx"/>
  <layer id="1" name="ground" width="100" height="100">
   <data encoding="csv">
@@ -108,6 +108,12 @@
  <objectgroup id="3" name="collision">
   <object id="2" x="0" y="6720">
    <polygon points="0,0 70,0 70,-70 350,-70 350,0 420,0 420,70 490,70 490,-70 560,-70 560,-140 840,-140 840,-70 980,-70 980,-140 1050,-140 1050,-210 1120,-210 1120,-280 1330,-280 1330,-210 1400,-210 1400,-280 1470,-280 1470,-420 1540,-420 1540,-490 1680,-490 1680,-560 1890,-560 1890,-490 1960,-490 1960,-560 2100,-560 2100,-700 2310,-700 2310,-630 2380,-630 2380,-700 2450,-700 2450,-770 2590,-770 2590,-840 2730,-840 2730,-770 2800,-770 2800,-700 3010,-700 3010,-560 3080,-560 3080,-630 3290,-630 3290,-490 3430,-490 3430,-420 3500,-420 3500,-280 3640,-280 3640,-210 3780,-210 3780,-280 3920,-280 3920,-350 4060,-350 4060,-420 4270,-420 4270,-490 4340,-490 4340,-560 4550,-560 4550,-630 4690,-630 4690,-700 4970,-700 4970,-630 5250,-630 5250,-700 5390,-700 5390,-770 5740,-770 5740,-700 5810,-700 5810,-770 5880,-770 5880,-840 6160,-840 6160,-770 6440,-770 6440,-840 6790,-840 6790,-910 6930,-910 6930,-980 7000,-980 7000,280 0,280"/>
+  </object>
+  <object id="4" x="7000" y="0">
+   <polyline points="0,0 0,7000"/>
+  </object>
+  <object id="5" x="0" y="7000">
+   <polyline points="0,0 0,-7000"/>
   </object>
  </objectgroup>
  <objectgroup id="2" name="player_start">

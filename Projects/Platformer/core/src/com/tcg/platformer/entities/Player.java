@@ -65,7 +65,7 @@ public class Player extends AbstractB2DSpriteEntity {
         // Foot fixture
         shape = new PolygonShape();
         shape.setAsBox(
-                bodyWidth, PLAYER_FOOT_HEIGHT * METERS_PER_PIXEL,
+                bodyWidth * 0.9f, PLAYER_FOOT_HEIGHT * METERS_PER_PIXEL,
                 new Vector2(0, -bodyHeight - (PLAYER_FOOT_HEIGHT * METERS_PER_PIXEL * 0.5f)),
                 0
         );
@@ -82,7 +82,7 @@ public class Player extends AbstractB2DSpriteEntity {
 
     public void handleInput() {
         if (MyInput.keyCheckPressed(MyInput.JUMP) && isOnGround()) {
-            body.applyForceToCenter(0, 500, true);
+            body.applyForceToCenter(0, PLAYER_JUMP_FORCE, true);
         }
         if (MyInput.keyCheck(MyInput.LEFT)) {
             body.setLinearVelocity(-PLAYER_SPEED, body.getLinearVelocity().y);
