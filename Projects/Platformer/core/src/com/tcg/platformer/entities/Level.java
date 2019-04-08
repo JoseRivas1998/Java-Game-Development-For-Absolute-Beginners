@@ -55,6 +55,7 @@ public class Level {
             float[] vertices = new float[0];
             float x = 0;
             float y = 0;
+            boolean createLoop = false;
             if(object instanceof PolygonMapObject) {
                 PolygonMapObject polygonMapObject = (PolygonMapObject) object;
                 Polygon polygon = polygonMapObject.getPolygon();
@@ -64,6 +65,7 @@ public class Level {
                 }
                 x = polygon.getX();
                 y = polygon.getY();
+                createLoop = true;
             } else if(object instanceof PolylineMapObject) {
                 PolylineMapObject polylineMapObject = (PolylineMapObject) object;
                 Polyline polyline = polylineMapObject.getPolyline();
@@ -81,8 +83,11 @@ public class Level {
             Body body = world.createBody(bodyDef);
 
             ChainShape polygonShape = new ChainShape();
-            polygonShape.createChain(vertices);
-
+            if(createLoop) {
+                polygonShape.createLoop(vertices);
+            } else {
+                polygonShape.createChain(vertices);
+            }
             FixtureDef fixtureDef = new FixtureDef();
             fixtureDef.shape = polygonShape;
             fixtureDef.friction = 0;

@@ -9,7 +9,7 @@ public class GameData {
     public static final float PIXELS_PER_METER = 70f;
     public static final float METERS_PER_PIXEL = 1f / PIXELS_PER_METER;
 
-    public static final boolean DEBUG = false;
+    public static final boolean DEBUG = true;
 
     // PHYSICS CONSTANTS
     public static final float WORLD_STEP_PER_SECOND = 60f;
@@ -31,6 +31,6 @@ public class GameData {
     public static final float PLAYER_ANIM_DURATION = 0.15f; // s / frame
     public static final float PLAYER_FOOT_HEIGHT = 4f; // m
     public static final float PLAYER_SPEED = 5f; // m/s
-    public static final float PLAYER_JUMP_FORCE = 400f; // N
+    public static final float PLAYER_JUMP_FORCE = 500f; // N
 
 }
