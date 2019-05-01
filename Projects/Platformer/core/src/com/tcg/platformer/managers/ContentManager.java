@@ -70,7 +70,8 @@ public class ContentManager implements Disposable {
         PINK_ALIEN_WALK("img/pinkAlien_walk.png"),
         PINK_ALIEN_STAND("img/pinkAlien_stand.png"),
         PINK_ALIEN_JUMP("img/pinkAlien_jump.png"),
-        LEVEL_BG("img/levelbg.png")
+        LEVEL_BG("img/levelbg.png"),
+        COIN("img/coin.png")
         ;
         public final String path;
 

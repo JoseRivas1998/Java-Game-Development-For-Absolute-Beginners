@@ -11,12 +11,11 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.tcg.platformer.GameData;
 import com.tcg.platformer.MyHelpers;
-import com.tcg.platformer.entities.Level;
-import com.tcg.platformer.entities.Player;
-import com.tcg.platformer.entities.SmoothEntityFollow;
-import com.tcg.platformer.entities.TilingBackground;
+import com.tcg.platformer.entities.*;
 import com.tcg.platformer.managers.ContentManager;
 import com.tcg.platformer.managers.GameStateManager;
+
+import java.util.Stack;
 
 import static com.tcg.platformer.GameData.*;
 
@@ -26,6 +25,7 @@ public class PlayState extends AbstractGameState {
     private float accumulator;
     private Viewport b2dView;
     private Box2DDebugRenderer b2dRenderer;
+    private Stack<AbstractB2DSpriteEntity> toRemove;
 
     private Level map;
     private Viewport gameView;
@@ -44,6 +44,7 @@ public class PlayState extends AbstractGameState {
     @Override
     protected void init() {
         initPhys();
+        toRemove = new Stack<AbstractB2DSpriteEntity>();
         map = new Level(0, world);
         gameView = new FitViewport(WORLD_WIDTH, WORLD_HEIGHT);
         gameView.getCamera().position.set(WORLD_WIDTH * 0.5f, WORLD_HEIGHT * 0.5f, 0);
@@ -73,9 +74,19 @@ public class PlayState extends AbstractGameState {
 
     @Override
     public void update(float dt) {
+        removeBodies();
         physicsStep(dt);
         player.update(dt);
+        map.updateObjects(dt);
         updateView();
+    }
+
+    private void removeBodies() {
+        while(!toRemove.empty()) {
+            AbstractB2DSpriteEntity entity = toRemove.pop();
+            world.destroyBody(entity.getBody());
+            map.remove(entity);
+        }
     }
 
     private void updateView() {
@@ -108,6 +119,7 @@ public class PlayState extends AbstractGameState {
         sb.begin();
         sb.setProjectionMatrix(gameView.getCamera().combined);
         player.draw(dt, sb, sr);
+        map.renderObjects(dt, sb, sr);
         sb.end();
         if(DEBUG) {
             b2dRenderer.render(world, b2dView.getCamera().combined);
@@ -131,23 +143,27 @@ public class PlayState extends AbstractGameState {
 
         private int playerFootContacts = 0;
 
+        private boolean isUserData(Fixture fixture, B2DUserData data) {
+            return (fixture.getUserData() != null && fixture.getUserData().equals(data));
+        }
+
         @Override
         public void beginContact(Contact contact) {
-            if(contact.getFixtureA().getUserData() != null && contact.getFixtureA().getUserData().equals(B2DUserData.PLAYER_FOOT)) {
-                playerFootContacts++;
-            }
-            if(contact.getFixtureB().getUserData() != null && contact.getFixtureB().getUserData().equals(B2DUserData.PLAYER_FOOT)) {
+            if(isUserData(contact.getFixtureA(), B2DUserData.PLAYER_FOOT) || isUserData(contact.getFixtureB(), B2DUserData.PLAYER_FOOT)) {
                 playerFootContacts++;
             }
             player.setOnGround(playerFootContacts > 0);
+            if(isUserData(contact.getFixtureA(), B2DUserData.COIN)) {
+                toRemove.push((AbstractB2DSpriteEntity) contact.getFixtureA().getBody().getUserData());
+            }
+            if(isUserData(contact.getFixtureB(), B2DUserData.COIN)) {
+                toRemove.push((AbstractB2DSpriteEntity) contact.getFixtureB().getBody().getUserData());
+            }
         }
 
         @Override
         public void endContact(Contact contact) {
-            if(contact.getFixtureA().getUserData() != null && contact.getFixtureA().getUserData().equals(B2DUserData.PLAYER_FOOT)) {
-                playerFootContacts--;
-            }
-            if(contact.getFixtureB().getUserData() != null && contact.getFixtureB().getUserData().equals(B2DUserData.PLAYER_FOOT)) {
+            if(isUserData(contact.getFixtureA(), B2DUserData.PLAYER_FOOT) || isUserData(contact.getFixtureB(), B2DUserData.PLAYER_FOOT)) {
                 playerFootContacts--;
             }
             player.setOnGround(playerFootContacts > 0);

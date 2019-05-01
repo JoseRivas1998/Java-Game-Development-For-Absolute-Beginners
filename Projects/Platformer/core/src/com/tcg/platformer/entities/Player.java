@@ -40,7 +40,8 @@ public class Player extends AbstractB2DSpriteEntity {
         setImage(idle, true);
     }
 
-    private void initB2DBody(World world, Vector2 spawnPoint) {
+    @Override
+    protected void initB2DBody(World world, Vector2 spawnPoint) {
         BodyDef bodyDef = new BodyDef();
         bodyDef.fixedRotation = true;
         bodyDef.type = BodyDef.BodyType.DynamicBody;
@@ -57,8 +58,8 @@ public class Player extends AbstractB2DSpriteEntity {
         // Main body fixture
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
-        fixtureDef.filter.categoryBits = GameData.PhysicsLayers.PLAYER;
-        fixtureDef.filter.maskBits = GameData.PhysicsLayers.GROUND;
+        fixtureDef.filter.categoryBits = PhysicsLayers.PLAYER;
+        fixtureDef.filter.maskBits = PhysicsLayers.GROUND | PhysicsLayers.COIN;
         body.createFixture(fixtureDef);
         shape.dispose();
 
@@ -101,14 +102,6 @@ public class Player extends AbstractB2DSpriteEntity {
 
     public void setOnGround(boolean onGround) {
         this.onGround = onGround;
-    }
-
-    @Override
-    public void update(float dt) {
-        setPosition(
-                (body.getPosition().x * PIXELS_PER_METER) - (imageWidth * .5f),
-                (body.getPosition().y * PIXELS_PER_METER) - (imageHeight * .5f)
-        );
     }
 
     @Override
