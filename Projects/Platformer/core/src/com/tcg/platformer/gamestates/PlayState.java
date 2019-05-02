@@ -17,7 +17,10 @@ import com.tcg.platformer.graphics.HUD;
 import com.tcg.platformer.managers.ContentManager;
 import com.tcg.platformer.managers.GameStateManager;
 
+import java.util.Iterator;
+import java.util.Set;
 import java.util.Stack;
+import java.util.TreeSet;
 
 import static com.tcg.platformer.GameData.*;
 
@@ -27,7 +30,7 @@ public class PlayState extends AbstractGameState {
     private float accumulator;
     private Viewport b2dView;
     private Box2DDebugRenderer b2dRenderer;
-    private Stack<AbstractB2DSpriteEntity> toRemove;
+    private Set<AbstractB2DSpriteEntity> toRemove;
 
     private Level map;
     private Viewport gameView;
@@ -49,7 +52,7 @@ public class PlayState extends AbstractGameState {
     @Override
     protected void init() {
         initPhys();
-        toRemove = new Stack<AbstractB2DSpriteEntity>();
+        toRemove = new TreeSet<AbstractB2DSpriteEntity>();
         map = new Level(0, world);
         gameView = new FitViewport(WORLD_WIDTH, WORLD_HEIGHT);
         gameView.getCamera().position.set(WORLD_WIDTH * 0.5f, WORLD_HEIGHT * 0.5f, 0);
@@ -57,6 +60,12 @@ public class PlayState extends AbstractGameState {
         parallaxView = new FitViewport(WORLD_WIDTH, WORLD_HEIGHT);
 
         player = new Player(world, map.getPlayerSpawnPosition());
+        player.setShootEvent(new EntityEvent<Player>() {
+            @Override
+            public void accept(Player entity) {
+                map.addObject(new Laser(world, entity));
+            }
+        });
         camFollow = new SmoothEntityFollow(25f, map.getPlayerSpawnPosition(), true);
         camFollow.setToFollow(player);
 
@@ -92,10 +101,12 @@ public class PlayState extends AbstractGameState {
     }
 
     private void removeBodies() {
-        while(!toRemove.empty()) {
-            AbstractB2DSpriteEntity entity = toRemove.pop();
+        Iterator<AbstractB2DSpriteEntity> iterator = toRemove.iterator();
+        while (iterator.hasNext()) {
+            AbstractB2DSpriteEntity entity = iterator.next();
             world.destroyBody(entity.getBody());
             map.remove(entity);
+            iterator.remove();
         }
     }
 
@@ -113,7 +124,7 @@ public class PlayState extends AbstractGameState {
 
     private void physicsStep(float dt) {
         accumulator += Math.min(dt, 0.25f);
-        while(accumulator >= TIME_STEP) {
+        while (accumulator >= TIME_STEP) {
             world.step(TIME_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
             accumulator -= TIME_STEP;
         }
@@ -132,7 +143,7 @@ public class PlayState extends AbstractGameState {
         map.renderObjects(dt, sb, sr);
         sb.end();
         hud.draw(dt, sb, sr);
-        if(DEBUG) {
+        if (DEBUG) {
             b2dRenderer.render(world, b2dView.getCamera().combined);
         }
     }
@@ -161,35 +172,43 @@ public class PlayState extends AbstractGameState {
 
         @Override
         public void beginContact(Contact contact) {
-            if(isUserData(contact.getFixtureA(), B2DUserData.PLAYER_FOOT) || isUserData(contact.getFixtureB(), B2DUserData.PLAYER_FOOT)) {
+            if (isUserData(contact.getFixtureA(), B2DUserData.PLAYER_FOOT) || isUserData(contact.getFixtureB(), B2DUserData.PLAYER_FOOT)) {
                 playerFootContacts++;
             }
             player.setOnGround(playerFootContacts > 0);
-            if(isUserData(contact.getFixtureA(), B2DUserData.COIN)) {
-                toRemove.push((AbstractB2DSpriteEntity) contact.getFixtureA().getBody().getUserData());
+            if (isUserData(contact.getFixtureA(), B2DUserData.COIN)) {
+                toRemove.add((AbstractB2DSpriteEntity) contact.getFixtureA().getBody().getUserData());
                 Platformer.content.playSound(ContentManager.SoundEffect.COIN);
                 coins++;
             }
-            if(isUserData(contact.getFixtureB(), B2DUserData.COIN)) {
-                toRemove.push((AbstractB2DSpriteEntity) contact.getFixtureB().getBody().getUserData());
+            if (isUserData(contact.getFixtureB(), B2DUserData.COIN)) {
+                toRemove.add((AbstractB2DSpriteEntity) contact.getFixtureB().getBody().getUserData());
                 Platformer.content.playSound(ContentManager.SoundEffect.COIN);
                 coins++;
+            }
+            if (isUserData(contact.getFixtureA(), B2DUserData.LASER)) {
+                toRemove.add((AbstractB2DSpriteEntity) contact.getFixtureA().getBody().getUserData());
+            }
+            if (isUserData(contact.getFixtureB(), B2DUserData.LASER)) {
+                toRemove.add((AbstractB2DSpriteEntity) contact.getFixtureB().getBody().getUserData());
             }
         }
 
         @Override
         public void endContact(Contact contact) {
-            if(isUserData(contact.getFixtureA(), B2DUserData.PLAYER_FOOT) || isUserData(contact.getFixtureB(), B2DUserData.PLAYER_FOOT)) {
+            if (isUserData(contact.getFixtureA(), B2DUserData.PLAYER_FOOT) || isUserData(contact.getFixtureB(), B2DUserData.PLAYER_FOOT)) {
                 playerFootContacts--;
             }
             player.setOnGround(playerFootContacts > 0);
         }
 
         @Override
-        public void preSolve(Contact contact, Manifold oldManifold) {}
+        public void preSolve(Contact contact, Manifold oldManifold) {
+        }
 
         @Override
-        public void postSolve(Contact contact, ContactImpulse impulse) {}
+        public void postSolve(Contact contact, ContactImpulse impulse) {
+        }
     }
 
 }

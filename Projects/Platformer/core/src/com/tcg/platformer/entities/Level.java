@@ -12,7 +12,6 @@ import com.badlogic.gdx.maps.objects.PolylineMapObject;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
-import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.physics.box2d.*;
@@ -137,8 +136,9 @@ public class Level {
         tiledMapRenderer.render();
     }
 
-    public boolean remove(AbstractB2DSpriteEntity entity) {
-        return objects.remove(entity);
+    public void remove(AbstractB2DSpriteEntity entity) {
+        entity.dispose();
+        objects.remove(entity);
     }
 
     public void renderObjects(float dt, SpriteBatch sb, ShapeRenderer sr) {

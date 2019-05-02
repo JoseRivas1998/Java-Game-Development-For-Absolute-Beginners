@@ -22,16 +22,21 @@ public class GameData {
         public static final short GROUND = 1 << 0;
         public static final short PLAYER = 1 << 1;
         public static final short COIN = 1 << 2;
+        public static final short LASER = 1 << 3;
     }
 
     public enum B2DUserData {
-        PLAYER_FOOT, COIN
+        PLAYER_FOOT, COIN, LASER
     }
 
     // PLAYER CONSTANTS
     public static final float PLAYER_ANIM_DURATION = 0.15f; // s / frame
-    public static final float PLAYER_FOOT_HEIGHT = 4f; // m
+    public static final float PLAYER_FOOT_HEIGHT = 4f; // px
     public static final float PLAYER_SPEED = 5f; // m/s
     public static final float PLAYER_JUMP_FORCE = 500f; // N
+
+    // LASER CONSTANTS
+    public static final float LASER_ANIM_DURATION = 0.05f; // s / frame
+    public static final float LASER_SPEED = 8f; // m/s
 
 }

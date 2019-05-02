@@ -20,6 +20,10 @@ public class MyInputProcessor extends InputAdapter {
             MyInput.setKey(MyInput.RIGHT, true);
             processed = true;
         }
+        if(keycode == Input.Keys.ENTER) {
+            MyInput.setKey(MyInput.SHOOT, true);
+            processed = true;
+        }
         return processed;
     }
 
@@ -36,6 +40,10 @@ public class MyInputProcessor extends InputAdapter {
         }
         if(keycode == Input.Keys.RIGHT || keycode == Input.Keys.D ) {
             MyInput.setKey(MyInput.RIGHT, false);
+            processed = true;
+        }
+        if(keycode == Input.Keys.ENTER) {
+            MyInput.setKey(MyInput.SHOOT, false);
             processed = true;
         }
         return processed;

@@ -7,7 +7,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
 
-public abstract class AbstractEntity implements Disposable {
+public abstract class AbstractEntity implements Disposable, Comparable<AbstractEntity> {
 
     public static final String TAG = AbstractEntity.class.getSimpleName();
 
@@ -131,7 +131,7 @@ public abstract class AbstractEntity implements Disposable {
     public boolean equals(Object obj) {
         boolean result = false;
         if (obj == null || obj.getClass() != this.getClass()) {
-            result = true;
+            result = false;
         } else {
             AbstractEntity other = (AbstractEntity) obj;
             result = this.id == other.id;
@@ -142,5 +142,10 @@ public abstract class AbstractEntity implements Disposable {
     @Override
     public String toString() {
         return getClass().getSimpleName() + "@id=" + this.id;
+    }
+
+    @Override
+    public int compareTo(AbstractEntity other) {
+        return this.id - other.id;
     }
 }

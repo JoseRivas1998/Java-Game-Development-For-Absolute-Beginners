@@ -24,12 +24,15 @@ public class Player extends AbstractB2DSpriteEntity {
 
     private boolean onGround;
 
+    private EntityEvent<Player> shootEvent;
+
     public Player(World world, Vector2 spawnPoint) {
         super();
         initAnim();
         initB2DBody(world, spawnPoint);
         stateTime = 0;
         onGround = true;
+        shootEvent = null;
     }
 
     private void initAnim() {
@@ -95,6 +98,9 @@ public class Player extends AbstractB2DSpriteEntity {
         } else {
             body.setLinearVelocity(0, body.getLinearVelocity().y);
         }
+        if(MyInput.keyCheckPressed(MyInput.SHOOT) && shootEvent != null) {
+            shootEvent.accept(this);
+        }
     }
 
     public boolean isOnGround() {
@@ -103,6 +109,10 @@ public class Player extends AbstractB2DSpriteEntity {
 
     public void setOnGround(boolean onGround) {
         this.onGround = onGround;
+    }
+
+    public void setShootEvent(EntityEvent<Player> shootEvent) {
+        this.shootEvent = shootEvent;
     }
 
     @Override
