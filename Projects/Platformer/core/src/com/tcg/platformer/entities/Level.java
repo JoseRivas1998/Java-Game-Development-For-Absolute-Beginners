@@ -97,6 +97,8 @@ public class Level {
             FixtureDef fixtureDef = new FixtureDef();
             fixtureDef.shape = polygonShape;
             fixtureDef.friction = 0;
+            fixtureDef.filter.categoryBits = PhysicsLayers.GROUND;
+            fixtureDef.filter.maskBits = -1; // -1 is the same thing as 1111 1111 1111 1111, meaning it can be with anything
             body.createFixture(fixtureDef);
             polygonShape.dispose();
         }
@@ -149,6 +151,10 @@ public class Level {
         for (AbstractB2DSpriteEntity object : objects) {
             object.update(dt);
         }
+    }
+
+    public void addObject(AbstractB2DSpriteEntity entity) {
+        objects.add(entity);
     }
 
 }

@@ -83,6 +83,7 @@ public class Player extends AbstractB2DSpriteEntity {
 
     public void handleInput() {
         if (MyInput.keyCheckPressed(MyInput.JUMP) && isOnGround()) {
+            Platformer.content.playSound(ContentManager.SoundEffect.JUMP);
             body.applyForceToCenter(0, PLAYER_JUMP_FORCE, true);
         }
         if (MyInput.keyCheck(MyInput.LEFT)) {

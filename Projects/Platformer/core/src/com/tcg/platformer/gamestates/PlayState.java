@@ -11,7 +11,9 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.tcg.platformer.GameData;
 import com.tcg.platformer.MyHelpers;
+import com.tcg.platformer.Platformer;
 import com.tcg.platformer.entities.*;
+import com.tcg.platformer.graphics.HUD;
 import com.tcg.platformer.managers.ContentManager;
 import com.tcg.platformer.managers.GameStateManager;
 
@@ -37,6 +39,9 @@ public class PlayState extends AbstractGameState {
 
     private TilingBackground background;
 
+    private int coins;
+    private HUD hud;
+
     public PlayState(GameStateManager gsm) {
         super(gsm);
     }
@@ -56,6 +61,10 @@ public class PlayState extends AbstractGameState {
         camFollow.setToFollow(player);
 
         background = new TilingBackground(ContentManager.Image.LEVEL_BG, map.getTopRight().x, map.getTopRight().y);
+
+        coins = 0;
+
+        hud = new HUD();
 
     }
 
@@ -79,6 +88,7 @@ public class PlayState extends AbstractGameState {
         player.update(dt);
         map.updateObjects(dt);
         updateView();
+        hud.update(dt, coins);
     }
 
     private void removeBodies() {
@@ -121,6 +131,7 @@ public class PlayState extends AbstractGameState {
         player.draw(dt, sb, sr);
         map.renderObjects(dt, sb, sr);
         sb.end();
+        hud.draw(dt, sb, sr);
         if(DEBUG) {
             b2dRenderer.render(world, b2dView.getCamera().combined);
         }
@@ -131,6 +142,7 @@ public class PlayState extends AbstractGameState {
         b2dView.update(width, height);
         gameView.update(width, height);
         parallaxView.update(width, height);
+        hud.resize(width, height);
     }
 
     @Override
@@ -155,9 +167,13 @@ public class PlayState extends AbstractGameState {
             player.setOnGround(playerFootContacts > 0);
             if(isUserData(contact.getFixtureA(), B2DUserData.COIN)) {
                 toRemove.push((AbstractB2DSpriteEntity) contact.getFixtureA().getBody().getUserData());
+                Platformer.content.playSound(ContentManager.SoundEffect.COIN);
+                coins++;
             }
             if(isUserData(contact.getFixtureB(), B2DUserData.COIN)) {
                 toRemove.push((AbstractB2DSpriteEntity) contact.getFixtureB().getBody().getUserData());
+                Platformer.content.playSound(ContentManager.SoundEffect.COIN);
+                coins++;
             }
         }
 

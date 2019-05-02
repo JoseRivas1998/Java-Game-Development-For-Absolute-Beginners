@@ -18,7 +18,16 @@ import java.util.Map;
 public class ContentManager implements Disposable {
 
     public enum Font {
-        ;
+        MAIN(
+                "fnt/roboto.ttf",
+                48,
+                Color.WHITE,
+                1,
+                Color.BLACK,
+                1,
+                1,
+                new Color(0xd2d2d2d2)
+        );
         public final String path;
         public final int fontSize;
         public final Color fontColor;
@@ -58,7 +67,8 @@ public class ContentManager implements Disposable {
     }
 
     public enum SoundEffect {
-        ;
+        COIN("snd/coin.mp3"),
+        JUMP("snd/jump.mp3");
         public final String path;
 
         SoundEffect(String path) {
