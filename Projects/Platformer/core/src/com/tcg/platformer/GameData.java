@@ -23,6 +23,7 @@ public class GameData {
         public static final short PLAYER = 1 << 1;
         public static final short COIN = 1 << 2;
         public static final short LASER = 1 << 3;
+        public static final short FLY = 1 << 4;
     }
 
     public enum B2DUserData {
@@ -38,5 +39,9 @@ public class GameData {
     // LASER CONSTANTS
     public static final float LASER_ANIM_DURATION = 0.05f; // s / frame
     public static final float LASER_SPEED = 8f; // m/s
+
+    // FLY CONSTANTS
+    public static final float FLY_SPEED = 0.75f; // m/s
+    public static final float FLY_ANIM_DURATION = 0.15f; // s / frame
 
 }

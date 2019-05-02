@@ -51,6 +51,7 @@ public class Level {
         loadGround(world);
         loadStartingPosition(world);
         loadCoins(world);
+        objects.add(new MeanFly(world, new Vector2(10, 10)));
     }
 
     private void loadGround(World world) {

@@ -63,6 +63,7 @@ public class PlayState extends AbstractGameState {
         player.setShootEvent(new EntityEvent<Player>() {
             @Override
             public void accept(Player entity) {
+                Platformer.content.playSound(ContentManager.SoundEffect.LASER);
                 map.addObject(new Laser(world, entity));
             }
         });

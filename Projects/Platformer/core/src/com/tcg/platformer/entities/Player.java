@@ -62,7 +62,7 @@ public class Player extends AbstractB2DSpriteEntity {
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
         fixtureDef.filter.categoryBits = PhysicsLayers.PLAYER;
-        fixtureDef.filter.maskBits = PhysicsLayers.GROUND | PhysicsLayers.COIN;
+        fixtureDef.filter.maskBits = PhysicsLayers.GROUND | PhysicsLayers.COIN | PhysicsLayers.FLY;
         body.createFixture(fixtureDef);
         shape.dispose();
 
