@@ -39,6 +39,7 @@ public class Level {
     private static final String COLLISION_LAYER = "collision";
     private static final String START_POS_LAYER = "player_start";
     private static final String COINS_LAYER = "coins";
+    private static final String FLIES_LAYER = "flies";
 
     public Level(int level, World world) {
         ContentManager.TmxMap tmxMap = ContentManager.TmxMap.values()[level];
@@ -51,7 +52,7 @@ public class Level {
         loadGround(world);
         loadStartingPosition(world);
         loadCoins(world);
-        objects.add(new MeanFly(world, new Vector2(10, 10)));
+        loadFlies(world);
     }
 
     private void loadGround(World world) {
@@ -120,6 +121,18 @@ public class Level {
                 Ellipse ellipse = ((EllipseMapObject) mapObject).getEllipse();
                 Vector2 spawnPoint = new Vector2(ellipse.x * METERS_PER_PIXEL, ellipse.y * METERS_PER_PIXEL);
                 objects.add(new Coin(world, spawnPoint));
+            }
+        }
+    }
+
+    private void loadFlies(World world) {
+        MapLayer flyLayer = tiledMap.getLayers().get(FLIES_LAYER);
+        MapObjects mapObjects = flyLayer.getObjects();
+        for(MapObject mapObject : mapObjects) {
+            if(mapObject instanceof RectangleMapObject) {
+                Rectangle rect = ((RectangleMapObject) mapObject).getRectangle();
+                Vector2 spawnPoint = new Vector2(rect.x * METERS_PER_PIXEL, rect.y * METERS_PER_PIXEL);
+                objects.add(new MeanFly(world, spawnPoint));
             }
         }
     }

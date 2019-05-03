@@ -81,4 +81,15 @@ public final class MyHelpers {
                 , 0);
     }
 
+    public static float sign(float n) {
+        int comparison = Float.compare(n, 0);
+        if(comparison == 0) {
+            return 0;
+        }
+        if(comparison > 0) {
+            return 1;
+        }
+        return -1;
+    }
+
 }

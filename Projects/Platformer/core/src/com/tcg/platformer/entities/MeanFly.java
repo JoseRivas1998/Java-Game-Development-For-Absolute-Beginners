@@ -54,9 +54,10 @@ public class MeanFly extends AbstractB2DSpriteEntity {
         shape.setAsBox(hWidth, hHeight);
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
-        fixtureDef.filter.categoryBits = GameData.PhysicsLayers.FLY;
-        fixtureDef.filter.maskBits = GameData.PhysicsLayers.PLAYER;
+        fixtureDef.filter.categoryBits = PhysicsLayers.FLY;
+        fixtureDef.filter.maskBits = PhysicsLayers.PLAYER | PhysicsLayers.LASER;
         Fixture fixture = body.createFixture(fixtureDef);
+        fixture.setUserData(B2DUserData.FLY);
         shape.dispose();
 
     }

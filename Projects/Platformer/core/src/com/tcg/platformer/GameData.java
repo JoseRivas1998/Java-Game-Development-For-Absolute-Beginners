@@ -1,5 +1,7 @@
 package com.tcg.platformer;
 
+import com.badlogic.gdx.math.MathUtils;
+
 public class GameData {
 
     // GRAPHICS
@@ -27,7 +29,7 @@ public class GameData {
     }
 
     public enum B2DUserData {
-        PLAYER_FOOT, COIN, LASER
+        PLAYER_FOOT, COIN, LASER, FLY
     }
 
     // PLAYER CONSTANTS
@@ -43,5 +45,9 @@ public class GameData {
     // FLY CONSTANTS
     public static final float FLY_SPEED = 0.75f; // m/s
     public static final float FLY_ANIM_DURATION = 0.15f; // s / frame
+
+    // PARTICLE CONSTANTS
+    public static final float PARTICLE_SPEED = 2; // m/s
+    public static final float PARTICLE_ANGLUAR_SPEED = MathUtils.PI; // rads/s
 
 }

@@ -55,7 +55,7 @@ public class Laser extends AbstractB2DSpriteEntity {
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
         fixtureDef.filter.categoryBits = GameData.PhysicsLayers.LASER;
-        fixtureDef.filter.maskBits = GameData.PhysicsLayers.GROUND;
+        fixtureDef.filter.maskBits = GameData.PhysicsLayers.GROUND | GameData.PhysicsLayers.FLY;
         Fixture fixture = body.createFixture(fixtureDef);
         fixture.setUserData(GameData.B2DUserData.LASER);
 

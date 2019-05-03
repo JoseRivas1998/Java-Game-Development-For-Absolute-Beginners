@@ -69,7 +69,8 @@ public class ContentManager implements Disposable {
     public enum SoundEffect {
         COIN("snd/coin.mp3"),
         JUMP("snd/jump.mp3"),
-        LASER("snd/laser.mp3")
+        LASER("snd/laser.mp3"),
+        FLY_DEATH("snd/fly_death.mp3")
         ;
         public final String path;
 
@@ -85,7 +86,8 @@ public class ContentManager implements Disposable {
         LEVEL_BG("img/levelbg.png"),
         COIN("img/coin.png"),
         LASER("img/laser.png"),
-        FLY("img/mean_fly.png")
+        FLY("img/mean_fly.png"),
+        PARTICLE("img/particle.png")
         ;
         public final String path;
 

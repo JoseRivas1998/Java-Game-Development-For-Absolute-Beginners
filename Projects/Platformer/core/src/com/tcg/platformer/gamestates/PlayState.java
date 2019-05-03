@@ -16,11 +16,9 @@ import com.tcg.platformer.entities.*;
 import com.tcg.platformer.graphics.HUD;
 import com.tcg.platformer.managers.ContentManager;
 import com.tcg.platformer.managers.GameStateManager;
+import com.tcg.platformer.managers.input.MyInput;
 
-import java.util.Iterator;
-import java.util.Set;
-import java.util.Stack;
-import java.util.TreeSet;
+import java.util.*;
 
 import static com.tcg.platformer.GameData.*;
 
@@ -31,6 +29,7 @@ public class PlayState extends AbstractGameState {
     private Viewport b2dView;
     private Box2DDebugRenderer b2dRenderer;
     private Set<AbstractB2DSpriteEntity> toRemove;
+    private Stack<Vector2> particlesToAdd;
 
     private Level map;
     private Viewport gameView;
@@ -44,6 +43,8 @@ public class PlayState extends AbstractGameState {
 
     private int coins;
     private HUD hud;
+
+    private List<Particle> particles;
 
     public PlayState(GameStateManager gsm) {
         super(gsm);
@@ -76,6 +77,9 @@ public class PlayState extends AbstractGameState {
 
         hud = new HUD();
 
+        particles = new ArrayList<Particle>();
+        particlesToAdd = new Stack<Vector2>();
+
     }
 
     private void initPhys() {
@@ -99,6 +103,28 @@ public class PlayState extends AbstractGameState {
         map.updateObjects(dt);
         updateView();
         hud.update(dt, coins);
+        updateParticles(dt);
+        addParticles();
+    }
+
+    private void addParticles() {
+        while(!particlesToAdd.empty()) {
+            Vector2 pos = particlesToAdd.pop();
+            particles.add(new Particle(world, pos));
+        }
+    }
+
+    private void updateParticles(float dt) {
+        Iterator<Particle> iter = particles.iterator();
+        while (iter.hasNext()) {
+            Particle p = iter.next();
+            p.update(dt);
+            if (p.getY() < 0) {
+                System.out.println(p);
+                toRemove.add(p);
+                iter.remove();
+            }
+        }
     }
 
     private void removeBodies() {
@@ -142,10 +168,17 @@ public class PlayState extends AbstractGameState {
         sb.setProjectionMatrix(gameView.getCamera().combined);
         player.draw(dt, sb, sr);
         map.renderObjects(dt, sb, sr);
+        drawParticles(dt, sb, sr);
         sb.end();
         hud.draw(dt, sb, sr);
         if (DEBUG) {
             b2dRenderer.render(world, b2dView.getCamera().combined);
+        }
+    }
+
+    private void drawParticles(float dt, SpriteBatch sb, ShapeRenderer sr) {
+        for (Particle particle : particles) {
+            particle.draw(dt, sb, sr);
         }
     }
 
@@ -161,6 +194,12 @@ public class PlayState extends AbstractGameState {
     public void dispose() {
         world.dispose();
         player.dispose();
+    }
+
+    public void spawnParticles(int amount, Vector2 position) {
+        for (int i = 0; i < amount; i++) {
+            particlesToAdd.push(position);
+        }
     }
 
     class GameContactListener implements ContactListener {
@@ -189,9 +228,21 @@ public class PlayState extends AbstractGameState {
             }
             if (isUserData(contact.getFixtureA(), B2DUserData.LASER)) {
                 toRemove.add((AbstractB2DSpriteEntity) contact.getFixtureA().getBody().getUserData());
+                if (isUserData(contact.getFixtureB(), B2DUserData.FLY)) {
+                    Body fly = contact.getFixtureB().getBody();
+                    spawnParticles(20, fly.getPosition());
+                    Platformer.content.playSound(ContentManager.SoundEffect.FLY_DEATH);
+                    toRemove.add((AbstractB2DSpriteEntity) fly.getUserData());
+                }
             }
             if (isUserData(contact.getFixtureB(), B2DUserData.LASER)) {
                 toRemove.add((AbstractB2DSpriteEntity) contact.getFixtureB().getBody().getUserData());
+                if (isUserData(contact.getFixtureA(), B2DUserData.FLY)) {
+                    Body fly = contact.getFixtureA().getBody();
+                    spawnParticles(20, fly.getPosition());
+                    Platformer.content.playSound(ContentManager.SoundEffect.FLY_DEATH);
+                    toRemove.add((AbstractB2DSpriteEntity) fly.getUserData());
+                }
             }
         }
 
