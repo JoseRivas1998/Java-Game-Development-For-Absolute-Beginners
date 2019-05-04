@@ -1,7 +1,5 @@
 package com.tcg.platformer.gamestates;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
@@ -16,7 +14,6 @@ import com.tcg.platformer.entities.*;
 import com.tcg.platformer.graphics.HUD;
 import com.tcg.platformer.managers.ContentManager;
 import com.tcg.platformer.managers.GameStateManager;
-import com.tcg.platformer.managers.input.MyInput;
 
 import java.util.*;
 
@@ -120,7 +117,6 @@ public class PlayState extends AbstractGameState {
             Particle p = iter.next();
             p.update(dt);
             if (p.getY() < 0) {
-                System.out.println(p);
                 toRemove.add(p);
                 iter.remove();
             }
@@ -212,38 +208,57 @@ public class PlayState extends AbstractGameState {
 
         @Override
         public void beginContact(Contact contact) {
+            checkPlayerGround(contact);
+            checkCoin(contact);
+            checkLaser(contact);
+        }
+
+        private void checkLaser(Contact contact) {
+            if (isUserData(contact.getFixtureA(), B2DUserData.LASER)) {
+                removeBody(contact.getFixtureA().getBody());
+                if (isUserData(contact.getFixtureB(), B2DUserData.FLY)) {
+                    laserHitFly(contact.getFixtureB().getBody());
+                }
+            }
+            if (isUserData(contact.getFixtureB(), B2DUserData.LASER)) {
+                removeBody(contact.getFixtureB().getBody());
+                if (isUserData(contact.getFixtureA(), B2DUserData.FLY)) {
+                    laserHitFly(contact.getFixtureA().getBody());
+                }
+            }
+        }
+
+        private void checkCoin(Contact contact) {
+            if (isUserData(contact.getFixtureA(), B2DUserData.COIN)) {
+                getCoin(contact.getFixtureA().getBody());
+            }
+            if (isUserData(contact.getFixtureB(), B2DUserData.COIN)) {
+                getCoin(contact.getFixtureB().getBody());
+            }
+        }
+
+        private void checkPlayerGround(Contact contact) {
             if (isUserData(contact.getFixtureA(), B2DUserData.PLAYER_FOOT) || isUserData(contact.getFixtureB(), B2DUserData.PLAYER_FOOT)) {
                 playerFootContacts++;
             }
             player.setOnGround(playerFootContacts > 0);
-            if (isUserData(contact.getFixtureA(), B2DUserData.COIN)) {
-                toRemove.add((AbstractB2DSpriteEntity) contact.getFixtureA().getBody().getUserData());
-                Platformer.content.playSound(ContentManager.SoundEffect.COIN);
-                coins++;
-            }
-            if (isUserData(contact.getFixtureB(), B2DUserData.COIN)) {
-                toRemove.add((AbstractB2DSpriteEntity) contact.getFixtureB().getBody().getUserData());
-                Platformer.content.playSound(ContentManager.SoundEffect.COIN);
-                coins++;
-            }
-            if (isUserData(contact.getFixtureA(), B2DUserData.LASER)) {
-                toRemove.add((AbstractB2DSpriteEntity) contact.getFixtureA().getBody().getUserData());
-                if (isUserData(contact.getFixtureB(), B2DUserData.FLY)) {
-                    Body fly = contact.getFixtureB().getBody();
-                    spawnParticles(20, fly.getPosition());
-                    Platformer.content.playSound(ContentManager.SoundEffect.FLY_DEATH);
-                    toRemove.add((AbstractB2DSpriteEntity) fly.getUserData());
-                }
-            }
-            if (isUserData(contact.getFixtureB(), B2DUserData.LASER)) {
-                toRemove.add((AbstractB2DSpriteEntity) contact.getFixtureB().getBody().getUserData());
-                if (isUserData(contact.getFixtureA(), B2DUserData.FLY)) {
-                    Body fly = contact.getFixtureA().getBody();
-                    spawnParticles(20, fly.getPosition());
-                    Platformer.content.playSound(ContentManager.SoundEffect.FLY_DEATH);
-                    toRemove.add((AbstractB2DSpriteEntity) fly.getUserData());
-                }
-            }
+        }
+
+        private void removeBody(Body laser) {
+            toRemove.add((AbstractB2DSpriteEntity) laser.getUserData());
+        }
+
+
+        private void getCoin(Body coin) {
+            removeBody(coin);
+            Platformer.content.playSound(ContentManager.SoundEffect.COIN);
+            coins++;
+        }
+
+        private void laserHitFly(Body fly) {
+            removeBody(fly);
+            spawnParticles(20, fly.getPosition());
+            Platformer.content.playSound(ContentManager.SoundEffect.FLY_DEATH);
         }
 
         @Override
