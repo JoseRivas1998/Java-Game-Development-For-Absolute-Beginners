@@ -19,7 +19,7 @@ public class Platformer extends ApplicationAdapter {
 	@Override
 	public void create () {
 		content = new ContentManager();
-		gameStateManager = new GameStateManager(GameStateType.PLAY);
+		gameStateManager = new GameStateManager(GameStateType.TITLE);
 		Gdx.input.setInputProcessor(new MyInputProcessor());
 	}
 

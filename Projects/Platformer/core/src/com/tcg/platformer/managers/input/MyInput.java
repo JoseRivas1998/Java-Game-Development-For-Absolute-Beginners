@@ -10,11 +10,12 @@ public final class MyInput {
 
     static final Vector2 mouse;
 
-    private static final int NUM_KEYS = 4;
+    private static final int NUM_KEYS = 5;
     public static final int LEFT = 0;
     public static final int RIGHT = 1;
     public static final int JUMP = 2;
     public static final int SHOOT = 3;
+    public static final int BACK = 4;
 
     static {
         mouse = new Vector2();

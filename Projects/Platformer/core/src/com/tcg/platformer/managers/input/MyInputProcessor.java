@@ -8,20 +8,24 @@ public class MyInputProcessor extends InputAdapter {
     @Override
     public boolean keyDown(int keycode) {
         boolean processed = false;
-        if(keycode == Input.Keys.SPACE) {
+        if (keycode == Input.Keys.SPACE) {
             MyInput.setKey(MyInput.JUMP, true);
             processed = true;
         }
-        if(keycode == Input.Keys.LEFT || keycode == Input.Keys.A ) {
+        if (keycode == Input.Keys.LEFT || keycode == Input.Keys.A) {
             MyInput.setKey(MyInput.LEFT, true);
             processed = true;
         }
-        if(keycode == Input.Keys.RIGHT || keycode == Input.Keys.D ) {
+        if (keycode == Input.Keys.RIGHT || keycode == Input.Keys.D) {
             MyInput.setKey(MyInput.RIGHT, true);
             processed = true;
         }
-        if(keycode == Input.Keys.ENTER) {
+        if (keycode == Input.Keys.ENTER) {
             MyInput.setKey(MyInput.SHOOT, true);
+            processed = true;
+        }
+        if (keycode == Input.Keys.ESCAPE) {
+            MyInput.setKey(MyInput.BACK, true);
             processed = true;
         }
         return processed;
@@ -30,20 +34,24 @@ public class MyInputProcessor extends InputAdapter {
     @Override
     public boolean keyUp(int keycode) {
         boolean processed = false;
-        if(keycode == Input.Keys.SPACE) {
+        if (keycode == Input.Keys.SPACE) {
             MyInput.setKey(MyInput.JUMP, false);
             processed = true;
         }
-        if(keycode == Input.Keys.LEFT || keycode == Input.Keys.A ) {
+        if (keycode == Input.Keys.LEFT || keycode == Input.Keys.A) {
             MyInput.setKey(MyInput.LEFT, false);
             processed = true;
         }
-        if(keycode == Input.Keys.RIGHT || keycode == Input.Keys.D ) {
+        if (keycode == Input.Keys.RIGHT || keycode == Input.Keys.D) {
             MyInput.setKey(MyInput.RIGHT, false);
             processed = true;
         }
-        if(keycode == Input.Keys.ENTER) {
+        if (keycode == Input.Keys.ENTER) {
             MyInput.setKey(MyInput.SHOOT, false);
+            processed = true;
+        }
+        if (keycode == Input.Keys.ESCAPE) {
+            MyInput.setKey(MyInput.BACK, false);
             processed = true;
         }
         return processed;

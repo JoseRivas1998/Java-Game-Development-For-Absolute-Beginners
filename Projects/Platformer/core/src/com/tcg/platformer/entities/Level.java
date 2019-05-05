@@ -40,19 +40,29 @@ public class Level {
     private static final String START_POS_LAYER = "player_start";
     private static final String COINS_LAYER = "coins";
     private static final String FLIES_LAYER = "flies";
+    private static final String LEVEL_END_LAYER = "level_end";
 
     public Level(int level, World world) {
-        ContentManager.TmxMap tmxMap = ContentManager.TmxMap.values()[level];
-        tiledMap = Platformer.content.getMap(tmxMap);
-        tileWidth = Platformer.content.tileWidth(tmxMap);
-        tileHeight = Platformer.content.tileHeight(tmxMap);
-        tiledMapRenderer = new OrthogonalTiledMapRenderer(tiledMap);
-        topRight = new Vector2(Platformer.content.mapWidthPixels(tmxMap), Platformer.content.mapHeightPixels(tmxMap));
-        objects = new ArrayList<AbstractB2DSpriteEntity>();
-        loadGround(world);
-        loadStartingPosition(world);
-        loadCoins(world);
-        loadFlies(world);
+        loadLevel(level, world);
+    }
+
+    public boolean loadLevel(int level, World world) {
+        if(level < ContentManager.TmxMap.values().length) {
+            ContentManager.TmxMap tmxMap = ContentManager.TmxMap.values()[level];
+            tiledMap = Platformer.content.getMap(tmxMap);
+            tileWidth = Platformer.content.tileWidth(tmxMap);
+            tileHeight = Platformer.content.tileHeight(tmxMap);
+            tiledMapRenderer = new OrthogonalTiledMapRenderer(tiledMap);
+            topRight = new Vector2(Platformer.content.mapWidthPixels(tmxMap), Platformer.content.mapHeightPixels(tmxMap));
+            objects = new ArrayList<AbstractB2DSpriteEntity>();
+            loadGround(world);
+            loadStartingPosition(world);
+            loadCoins(world);
+            loadFlies(world);
+            loadLevelEnd(world);
+            return true;
+        }
+        return false;
     }
 
     private void loadGround(World world) {
@@ -137,6 +147,37 @@ public class Level {
         }
     }
 
+    private void loadLevelEnd(World world) {
+        MapLayer levelEndLayer = tiledMap.getLayers().get(LEVEL_END_LAYER);
+        MapObjects mapObjects = levelEndLayer.getObjects();
+        for (MapObject mapObject : mapObjects) {
+            if(mapObject instanceof RectangleMapObject) {
+                Rectangle rect = ((RectangleMapObject) mapObject).getRectangle();
+
+                float hWidth = (rect.width * METERS_PER_PIXEL) * 0.5f;
+                float hHeight = (rect.height * METERS_PER_PIXEL) * 0.5f;
+
+                BodyDef bodyDef = new BodyDef();
+                bodyDef.type = BodyDef.BodyType.StaticBody;
+                bodyDef.position.set(rect.x * METERS_PER_PIXEL + hWidth, rect.y * METERS_PER_PIXEL + hHeight);
+                Body body = world.createBody(bodyDef);
+
+                PolygonShape shape = new PolygonShape();
+                shape.setAsBox(hWidth, hHeight);
+
+                FixtureDef fixtureDef = new FixtureDef();
+                fixtureDef.isSensor = true;
+                fixtureDef.shape = shape;
+                fixtureDef.filter.categoryBits = PhysicsLayers.LEVEL_END;
+                fixtureDef.filter.maskBits = PhysicsLayers.PLAYER;
+                Fixture fixture = body.createFixture(fixtureDef);
+                fixture.setUserData(B2DUserData.LEVEL_END);
+                shape.dispose();
+
+            }
+        }
+    }
+
     public Vector2 getPlayerSpawnPosition() {
         return new Vector2(playerSpawnPosition);
     }
@@ -169,6 +210,12 @@ public class Level {
 
     public void addObject(AbstractB2DSpriteEntity entity) {
         objects.add(entity);
+    }
+
+    public void removeAllObjects() {
+        while(!objects.isEmpty()) {
+            remove(objects.get(0));
+        }
     }
 
 }

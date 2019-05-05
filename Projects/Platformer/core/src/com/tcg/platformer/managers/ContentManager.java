@@ -97,7 +97,9 @@ public class ContentManager implements Disposable {
     }
 
     public enum TmxMap {
-        LEVEL_1("maps/map01.tmx");
+        LEVEL_1("maps/map01.tmx"),
+        LEVEL_2("maps/map02.tmx")
+        ;
         public final String path;
 
         TmxMap(String path) {

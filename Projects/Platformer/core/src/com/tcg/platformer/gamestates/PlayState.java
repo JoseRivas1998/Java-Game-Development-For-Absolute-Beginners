@@ -1,13 +1,14 @@
 package com.tcg.platformer.gamestates;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import com.tcg.platformer.GameData;
 import com.tcg.platformer.MyHelpers;
 import com.tcg.platformer.Platformer;
 import com.tcg.platformer.entities.*;
@@ -43,6 +44,9 @@ public class PlayState extends AbstractGameState {
 
     private List<Particle> particles;
 
+    private int currentLevel;
+    private boolean shouldGoToNextLevel;
+
     public PlayState(GameStateManager gsm) {
         super(gsm);
     }
@@ -50,8 +54,9 @@ public class PlayState extends AbstractGameState {
     @Override
     protected void init() {
         initPhys();
+        currentLevel = 0;
         toRemove = new TreeSet<AbstractB2DSpriteEntity>();
-        map = new Level(0, world);
+        map = new Level(currentLevel, world);
         gameView = new FitViewport(WORLD_WIDTH, WORLD_HEIGHT);
         gameView.getCamera().position.set(WORLD_WIDTH * 0.5f, WORLD_HEIGHT * 0.5f, 0);
         gameView.getCamera().update();
@@ -61,8 +66,7 @@ public class PlayState extends AbstractGameState {
         player.setShootEvent(new EntityEvent<Player>() {
             @Override
             public void accept(Player entity) {
-                Platformer.content.playSound(ContentManager.SoundEffect.LASER);
-                map.addObject(new Laser(world, entity));
+                shootLaser(entity);
             }
         });
         camFollow = new SmoothEntityFollow(25f, map.getPlayerSpawnPosition(), true);
@@ -76,7 +80,46 @@ public class PlayState extends AbstractGameState {
 
         particles = new ArrayList<Particle>();
         particlesToAdd = new Stack<Vector2>();
+        shouldGoToNextLevel = false;
 
+    }
+
+    private void shootLaser(Player entity) {
+        Platformer.content.playSound(ContentManager.SoundEffect.LASER);
+        map.addObject(new Laser(world, entity));
+    }
+
+    private void goToNextLevel() {
+        shouldGoToNextLevel = false;
+        currentLevel++;
+        map.removeAllObjects();
+        removeWorldBodies();
+        if(map.loadLevel(currentLevel, world)) {
+            player.dispose();
+            player = new Player(world, map.getPlayerSpawnPosition());
+            player.setShootEvent(new EntityEvent<Player>() {
+                @Override
+                public void accept(Player entity) {
+                    shootLaser(entity);
+                }
+            });
+            background.setWidth(map.getTopRight().x);
+            background.setHeight(map.getTopRight().y);
+            coins = 0;
+            camFollow.setToFollow(player);
+            camFollow.setPos(map.getPlayerSpawnPosition());
+            toRemove.clear();
+        } else {
+            switchState(GameStateType.TITLE);
+        }
+    }
+
+    private void removeWorldBodies() {
+        Array<Body> bodies = new Array<Body>();
+        world.getBodies(bodies);
+        for (Body body : bodies) {
+            world.destroyBody(body);
+        }
     }
 
     private void initPhys() {
@@ -94,6 +137,9 @@ public class PlayState extends AbstractGameState {
 
     @Override
     public void update(float dt) {
+        if(shouldGoToNextLevel) {
+            goToNextLevel();
+        }
         removeBodies();
         physicsStep(dt);
         player.update(dt);
@@ -188,6 +234,9 @@ public class PlayState extends AbstractGameState {
 
     @Override
     public void dispose() {
+        removeWorldBodies();
+        map.removeAllObjects();
+        toRemove.clear();
         world.dispose();
         player.dispose();
     }
@@ -211,6 +260,13 @@ public class PlayState extends AbstractGameState {
             checkPlayerGround(contact);
             checkCoin(contact);
             checkLaser(contact);
+            checkLevelEnd(contact);
+        }
+
+        private void checkLevelEnd(Contact contact) {
+            if(isUserData(contact.getFixtureA(), B2DUserData.LEVEL_END) || isUserData(contact.getFixtureB(), B2DUserData.LEVEL_END)) {
+                shouldGoToNextLevel = true;
+            }
         }
 
         private void checkLaser(Contact contact) {

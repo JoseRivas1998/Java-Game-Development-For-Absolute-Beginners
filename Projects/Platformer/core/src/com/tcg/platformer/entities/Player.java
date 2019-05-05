@@ -62,8 +62,9 @@ public class Player extends AbstractB2DSpriteEntity {
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
         fixtureDef.filter.categoryBits = PhysicsLayers.PLAYER;
-        fixtureDef.filter.maskBits = PhysicsLayers.GROUND | PhysicsLayers.COIN | PhysicsLayers.FLY;
-        body.createFixture(fixtureDef);
+        fixtureDef.filter.maskBits = PhysicsLayers.GROUND | PhysicsLayers.COIN | PhysicsLayers.FLY | PhysicsLayers.LEVEL_END;
+        Fixture mainBody = body.createFixture(fixtureDef);
+        mainBody.setUserData(B2DUserData.PLAYER_BODY);
         shape.dispose();
 
         // Foot fixture

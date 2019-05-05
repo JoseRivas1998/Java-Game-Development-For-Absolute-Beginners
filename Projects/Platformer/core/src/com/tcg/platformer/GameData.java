@@ -11,7 +11,7 @@ public class GameData {
     public static final float PIXELS_PER_METER = 70f;
     public static final float METERS_PER_PIXEL = 1f / PIXELS_PER_METER;
 
-    public static final boolean DEBUG = false;
+    public static final boolean DEBUG = true;
 
     // PHYSICS CONSTANTS
     public static final float WORLD_STEP_PER_SECOND = 60f;
@@ -26,10 +26,11 @@ public class GameData {
         public static final short COIN = 1 << 2;
         public static final short LASER = 1 << 3;
         public static final short FLY = 1 << 4;
+        public static final short LEVEL_END = 1 << 5;
     }
 
     public enum B2DUserData {
-        PLAYER_FOOT, COIN, LASER, FLY
+        PLAYER_BODY, PLAYER_FOOT, COIN, LASER, FLY, LEVEL_END
     }
 
     // PLAYER CONSTANTS

@@ -31,6 +31,10 @@ public class SmoothEntityFollow {
         return new Vector2(pos);
     }
 
+    public void setPos(Vector2 pos) {
+        this.pos.set(pos);
+    }
+
     public void setFollowCenter(boolean followCenter) {
         this.followCenter = followCenter;
     }
