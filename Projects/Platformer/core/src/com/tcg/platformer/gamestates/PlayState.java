@@ -137,9 +137,6 @@ public class PlayState extends AbstractGameState {
 
     @Override
     public void update(float dt) {
-        if(shouldGoToNextLevel) {
-            goToNextLevel();
-        }
         removeBodies();
         physicsStep(dt);
         player.update(dt);
@@ -148,6 +145,9 @@ public class PlayState extends AbstractGameState {
         hud.update(dt, coins);
         updateParticles(dt);
         addParticles();
+        if(shouldGoToNextLevel) {
+            goToNextLevel();
+        }
     }
 
     private void addParticles() {
