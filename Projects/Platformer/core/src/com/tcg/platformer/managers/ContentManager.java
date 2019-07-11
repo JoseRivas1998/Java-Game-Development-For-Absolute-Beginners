@@ -87,7 +87,8 @@ public class ContentManager implements Disposable {
         COIN("img/coin.png"),
         LASER("img/laser.png"),
         FLY("img/mean_fly.png"),
-        PARTICLE("img/particle.png")
+        PARTICLE("img/particle.png"),
+        INVINCIBLE("img/invincible.png")
         ;
         public final String path;
 

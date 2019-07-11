@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.tcg.platformer.GameData;
@@ -26,6 +27,9 @@ public class Player extends AbstractB2DSpriteEntity {
 
     private EntityEvent<Player> shootEvent;
 
+    private float invincibleTime;
+    private int health;
+
     public Player(World world, Vector2 spawnPoint) {
         super();
         initAnim();
@@ -33,6 +37,8 @@ public class Player extends AbstractB2DSpriteEntity {
         stateTime = 0;
         onGround = true;
         shootEvent = null;
+        invincibleTime = PLAYER_INVINCIBILITY + 1f;
+        health = GameData.PLAYER_MAX_HEALTH;
     }
 
     private void initAnim() {
@@ -90,16 +96,15 @@ public class Player extends AbstractB2DSpriteEntity {
             Platformer.content.playSound(ContentManager.SoundEffect.JUMP);
             body.applyForceToCenter(0, PLAYER_JUMP_FORCE, true);
         }
-        if (MyInput.keyCheck(MyInput.LEFT)) {
+        if (MyInput.keyCheck(MyInput.LEFT) && invincibleTime >= PLAYER_INVINCIBILITY) {
             body.setLinearVelocity(-PLAYER_SPEED, body.getLinearVelocity().y);
-            scaleX = -1;
-        } else if (MyInput.keyCheck(MyInput.RIGHT)) {
+        } else if (MyInput.keyCheck(MyInput.RIGHT) && invincibleTime >= PLAYER_INVINCIBILITY) {
             body.setLinearVelocity(PLAYER_SPEED, body.getLinearVelocity().y);
             scaleX = 1;
-        } else {
+        } else if (invincibleTime >= PLAYER_INVINCIBILITY) {
             body.setLinearVelocity(0, body.getLinearVelocity().y);
         }
-        if(MyInput.keyCheckPressed(MyInput.SHOOT) && shootEvent != null) {
+        if (MyInput.keyCheckPressed(MyInput.SHOOT) && shootEvent != null) {
             shootEvent.accept(this);
         }
     }
@@ -116,11 +121,34 @@ public class Player extends AbstractB2DSpriteEntity {
         this.shootEvent = shootEvent;
     }
 
+    public int getHealth() {
+        return this.health;
+    }
+
+    public void dealDamage() {
+        if (invincibleTime >= PLAYER_INVINCIBILITY) {
+            invincibleTime = 0;
+            health -= 10;
+        }
+        body.setLinearVelocity(new Vector2(body.getLinearVelocity()).scl(-1));
+    }
+
+    @Override
+    public void update(float dt) {
+        super.update(dt);
+        invincibleTime += dt;
+        if(body.getLinearVelocity().x < 0) {
+            scaleX = -1;
+        } else if(body.getLinearVelocity().x > 0) {
+            scaleX = 1;
+        }
+    }
+
     @Override
     public void draw(float dt, SpriteBatch sb, ShapeRenderer sr) {
         stateTime += dt;
-        if(onGround) {
-            if(Float.compare(body.getLinearVelocity().x, 0) == 0) {
+        if (onGround) {
+            if (Float.compare(body.getLinearVelocity().x, 0) == 0) {
                 setImage(idle);
             } else {
                 setImage(walkAnim.getKeyFrame(stateTime, true));
@@ -131,6 +159,9 @@ public class Player extends AbstractB2DSpriteEntity {
         setSize(imageWidth, imageHeight);
         centerOrigin(true);
         super.draw(dt, sb, sr);
+        if (invincibleTime < PLAYER_INVINCIBILITY) {
+            sb.draw(Platformer.content.getTexture(ContentManager.Image.INVINCIBLE), getX(), getY(), getWidth(), getHeight());
+        }
     }
 
     @Override

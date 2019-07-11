@@ -11,7 +11,7 @@ public class GameData {
     public static final float PIXELS_PER_METER = 70f;
     public static final float METERS_PER_PIXEL = 1f / PIXELS_PER_METER;
 
-    public static final boolean DEBUG = true;
+    public static final boolean DEBUG = false;
 
     // PHYSICS CONSTANTS
     public static final float WORLD_STEP_PER_SECOND = 60f;
@@ -38,10 +38,13 @@ public class GameData {
     public static final float PLAYER_FOOT_HEIGHT = 4f; // px
     public static final float PLAYER_SPEED = 5f; // m/s
     public static final float PLAYER_JUMP_FORCE = 500f; // N
+    public static final float PLAYER_INVINCIBILITY = 0.3333f; // seconds
+    public static final int PLAYER_MAX_HEALTH = 100;
 
     // LASER CONSTANTS
     public static final float LASER_ANIM_DURATION = 0.05f; // s / frame
     public static final float LASER_SPEED = 8f; // m/s
+    public static final float LASER_ERROR = 0.1f; // m
 
     // FLY CONSTANTS
     public static final float FLY_SPEED = 0.75f; // m/s

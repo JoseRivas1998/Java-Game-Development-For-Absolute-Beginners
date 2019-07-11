@@ -142,7 +142,7 @@ public class PlayState extends AbstractGameState {
         player.update(dt);
         map.updateObjects(dt);
         updateView();
-        hud.update(dt, coins);
+        hud.update(dt, coins, player.getHealth());
         updateParticles(dt);
         addParticles();
         if(shouldGoToNextLevel) {
@@ -261,6 +261,7 @@ public class PlayState extends AbstractGameState {
             checkCoin(contact);
             checkLaser(contact);
             checkLevelEnd(contact);
+            checkPlayerFly(contact);
         }
 
         private void checkLevelEnd(Contact contact) {
@@ -298,6 +299,13 @@ public class PlayState extends AbstractGameState {
                 playerFootContacts++;
             }
             player.setOnGround(playerFootContacts > 0);
+        }
+
+        private void checkPlayerFly(Contact contact) {
+            if((isUserData(contact.getFixtureA(), B2DUserData.PLAYER_BODY) && isUserData(contact.getFixtureB(), B2DUserData.FLY)) ||
+                (isUserData(contact.getFixtureA(), B2DUserData.FLY) && isUserData(contact.getFixtureB(), B2DUserData.PLAYER_BODY))) {
+                player.dealDamage();
+            }
         }
 
         private void removeBody(Body laser) {

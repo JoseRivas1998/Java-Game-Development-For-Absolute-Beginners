@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.tcg.platformer.GameData;
@@ -22,7 +23,7 @@ public class Laser extends AbstractB2DSpriteEntity {
     public Laser(World world, AbstractB2DSpriteEntity source) {
         super();
         initAnim(source);
-        initB2DBody(world, source.body.getPosition());
+        initB2DBody(world, new Vector2(source.body.getPosition().x, source.body.getPosition().y + MathUtils.random(-GameData.LASER_ERROR, GameData.LASER_ERROR)));
     }
 
     private void initAnim(AbstractB2DSpriteEntity source) {
