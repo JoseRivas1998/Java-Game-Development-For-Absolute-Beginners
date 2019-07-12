@@ -7,6 +7,8 @@ import com.tcg.asteroids.Asteroids;
 public class DesktopLauncher {
 	public static void main (String[] arg) {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
+		config.width = Asteroids.WORLD_WIDTH;
+		config.height = Asteroids.WORLD_HEIGHT;
 		new LwjglApplication(new Asteroids(), config);
 	}
 }
