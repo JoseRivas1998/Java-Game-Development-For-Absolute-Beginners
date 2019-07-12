@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.tcg.platformer.entities.LabelEntity;
 import com.tcg.platformer.entities.TilingBackground;
 import com.tcg.platformer.managers.ContentManager;
 import com.tcg.platformer.managers.GameStateManager;
@@ -18,6 +19,9 @@ public class TitleState extends AbstractGameState {
     private Viewport viewport;
     private TilingBackground background;
 
+    private LabelEntity title;
+    private LabelEntity pressStart;
+
     public TitleState(GameStateManager gsm) {
         super(gsm);
     }
@@ -26,6 +30,17 @@ public class TitleState extends AbstractGameState {
     protected void init() {
         viewport = new FitViewport(WORLD_WIDTH, WORLD_HEIGHT);
         background = new TilingBackground(ContentManager.Image.LEVEL_BG, WORLD_WIDTH, WORLD_HEIGHT);
+        title = new LabelEntity();
+        title.setText("Platformer");
+        title.setAlign(LabelEntity.MIDDLE_CENTER);
+        title.setFont(ContentManager.Font.TITLE);
+        title.setPosition(WORLD_WIDTH * 0.5f, WORLD_HEIGHT * 0.75f);
+
+        pressStart = new LabelEntity();
+        pressStart.setText("Press Start to Begin!");
+        pressStart.setAlign(LabelEntity.MIDDLE_CENTER);
+        pressStart.setFont(ContentManager.Font.MAIN);
+        pressStart.setPosition(WORLD_WIDTH * 0.5f, WORLD_HEIGHT * 0.25f);
 
     }
 
@@ -42,6 +57,8 @@ public class TitleState extends AbstractGameState {
     @Override
     public void update(float dt) {
         viewport.apply(true);
+        title.update(dt);
+        pressStart.update(dt);
     }
 
     @Override
@@ -49,6 +66,8 @@ public class TitleState extends AbstractGameState {
         sb.begin();
         sb.setProjectionMatrix(viewport.getCamera().combined);
         background.draw(sb);
+        title.draw(dt, sb, sr);
+        pressStart.draw(dt, sb, sr);
         sb.end();
     }
 

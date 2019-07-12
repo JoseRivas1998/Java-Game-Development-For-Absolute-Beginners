@@ -27,6 +27,16 @@ public class ContentManager implements Disposable {
                 1,
                 1,
                 new Color(0xd2d2d2d2)
+        ),
+        TITLE(
+                "fnt/roboto.ttf",
+                72,
+                Color.WHITE,
+                1,
+                Color.BLACK,
+                1,
+                1,
+                new Color(0xd2d2d2d2)
         );
         public final String path;
         public final int fontSize;

@@ -46,6 +46,7 @@ public class PlayState extends AbstractGameState {
 
     private int currentLevel;
     private boolean shouldGoToNextLevel;
+    private boolean shouldReturnToTitle;
 
     public PlayState(GameStateManager gsm) {
         super(gsm);
@@ -81,6 +82,7 @@ public class PlayState extends AbstractGameState {
         particles = new ArrayList<Particle>();
         particlesToAdd = new Stack<Vector2>();
         shouldGoToNextLevel = false;
+        shouldReturnToTitle = false;
 
     }
 
@@ -147,6 +149,9 @@ public class PlayState extends AbstractGameState {
         addParticles();
         if(shouldGoToNextLevel) {
             goToNextLevel();
+        }
+        if(shouldReturnToTitle) {
+            switchState(GameStateType.TITLE);
         }
     }
 
@@ -305,6 +310,9 @@ public class PlayState extends AbstractGameState {
             if((isUserData(contact.getFixtureA(), B2DUserData.PLAYER_BODY) && isUserData(contact.getFixtureB(), B2DUserData.FLY)) ||
                 (isUserData(contact.getFixtureA(), B2DUserData.FLY) && isUserData(contact.getFixtureB(), B2DUserData.PLAYER_BODY))) {
                 player.dealDamage();
+                if(player.getHealth() <= 0) {
+                    shouldReturnToTitle = true;
+                }
             }
         }
 
