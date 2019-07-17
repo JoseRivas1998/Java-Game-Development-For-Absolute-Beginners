@@ -6,6 +6,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.tcg.asteroids.Asteroids;
 import com.tcg.asteroids.MyHelpers;
+import com.tcg.asteroids.managers.ContentManager;
 import com.tcg.asteroids.managers.input.MyInput;
 
 public class Ship extends AbstractEntity {
@@ -29,14 +30,14 @@ public class Ship extends AbstractEntity {
         reset();
     }
 
-    private void reset() {
+    public void reset() {
         setVelocity(0, 0);
         setX(Asteroids.WORLD_WIDTH * 0.5f);
         setY(Asteroids.WORLD_HEIGHT * 0.5f);
         this.angle = 0;
         isThrusting = false;
         setShape();
-        // TODO stop thruster sound
+        Asteroids.content.stopSound(ContentManager.SoundEffect.THRUSTER);
     }
 
     public void handleInput(float dt) {
@@ -51,9 +52,11 @@ public class Ship extends AbstractEntity {
             setVelocity(getVelocity().add(acceleration));
             if (!isThrusting) {
                 isThrusting = true;
+                Asteroids.content.loopSound(ContentManager.SoundEffect.THRUSTER);
             }
         } else {
             isThrusting = false;
+            Asteroids.content.stopSound(ContentManager.SoundEffect.THRUSTER);
         }
     }
 
@@ -63,7 +66,7 @@ public class Ship extends AbstractEntity {
         setPointDegrees(1, getRadius(), 135);
         setPointDegrees(2, getRadius() * 0.25f, 180);
         setPointDegrees(3, getRadius(), 225);
-        if(isThrusting) {
+        if (isThrusting) {
             setFlame();
         }
     }
@@ -76,7 +79,7 @@ public class Ship extends AbstractEntity {
 
     private void setFlamePoint(int point, float length, float angleDegrees) {
         Vector2 offset = MyHelpers.polarVectorRadians(length, (angleDegrees * MathUtils.degreesToRadians) + this.angle);
-        if(flame[point] != null) {
+        if (flame[point] != null) {
             flame[point].set(getX() + offset.x, getY() + offset.y);
         } else {
             flame[point] = new Vector2(getX() + offset.x, getY() + offset.y);
@@ -95,7 +98,7 @@ public class Ship extends AbstractEntity {
     public void draw(float dt, ShapeRenderer sr) {
         sr.setColor(SHIP_COLOR);
         drawPoints(sr);
-        if(isThrusting) {
+        if (isThrusting) {
             sr.setColor(THRUST_COLOR);
             AbstractEntity.drawVector(flame, sr, false);
         }

@@ -29,6 +29,10 @@ public class MyInputProcessor extends InputAdapter {
             MyInput.setKey(MyInput.THRUST, value);
             keyFound = true;
         }
+        if(keycode == Input.Keys.SPACE) {
+            MyInput.setKey(MyInput.SHOOT, value);
+            keyFound = true;
+        }
         return keyFound;
     }
 

@@ -1,5 +1,6 @@
 package com.tcg.asteroids;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
@@ -69,6 +70,17 @@ public final class MyHelpers {
             return min;
         }
         return n;
+    }
+
+    public static Color randomColor() {
+        int rgb = MathUtils.random(0xFFFFFF);
+        int rgba = (rgb << 8) | 0xFF;
+        return new Color(rgba);
+    }
+
+    public static Vector2 randomVector(float magnitude) {
+        float angle = MathUtils.random(MathUtils.PI2);
+        return polarVectorRadians(magnitude, angle);
     }
 
 }

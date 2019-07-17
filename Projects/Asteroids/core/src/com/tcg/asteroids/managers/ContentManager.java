@@ -56,7 +56,10 @@ public class ContentManager implements Disposable {
     }
 
     public enum SoundEffect {
-        ;
+        PULSE_HIGH("snd/pulsehigh.ogg"),
+        PULSE_LOW("snd/pulselow.ogg"),
+        SHOOT("snd/shoot.ogg"),
+        THRUSTER("snd/thruster.ogg");
         public final String path;
 
         SoundEffect(String path) {

@@ -9,6 +9,7 @@ public class DesktopLauncher {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
 		config.width = Asteroids.WORLD_WIDTH;
 		config.height = Asteroids.WORLD_HEIGHT;
+		config.foregroundFPS = 0;
 		new LwjglApplication(new Asteroids(), config);
 	}
 }

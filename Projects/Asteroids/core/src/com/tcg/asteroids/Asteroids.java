@@ -13,8 +13,8 @@ import com.tcg.asteroids.managers.input.MyInputProcessor;
 
 public class Asteroids extends ApplicationAdapter {
 
-	public static final int WORLD_WIDTH = 800;
-	public static final int WORLD_HEIGHT = 600;
+	public static final int WORLD_WIDTH = 1280;
+	public static final int WORLD_HEIGHT = 720;
 
 	private GameStateManager gsm;
 	public static ContentManager content;
