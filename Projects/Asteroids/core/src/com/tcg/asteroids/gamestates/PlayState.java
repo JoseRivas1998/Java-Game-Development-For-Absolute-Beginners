@@ -7,10 +7,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.tcg.asteroids.Asteroids;
 import com.tcg.asteroids.MyHelpers;
-import com.tcg.asteroids.entities.Asteroid;
-import com.tcg.asteroids.entities.Bullet;
-import com.tcg.asteroids.entities.Ship;
-import com.tcg.asteroids.entities.Star;
+import com.tcg.asteroids.entities.*;
 import com.tcg.asteroids.managers.ContentManager;
 import com.tcg.asteroids.managers.GameStateManager;
 import com.tcg.asteroids.managers.input.MyInput;
@@ -28,6 +25,7 @@ public class PlayState extends AbstractGameState {
     private static final float MAX_ASTEROID_SPAWN_TIME = 4f;
 
     private static final int NUM_STARS = 100;
+    private static final int ASTEROID_EXPLODE_PARTICLES = 15;
     private static final float PULSE_TIME = 0.75f;
 
     private Viewport viewport;
@@ -42,6 +40,8 @@ public class PlayState extends AbstractGameState {
     private Timer pulseTimer;
 
     private List<Bullet> bullets;
+
+    private List<Particle> particles;
 
     public PlayState(GameStateManager gsm) {
         super(gsm);
@@ -88,6 +88,8 @@ public class PlayState extends AbstractGameState {
             }
         });
 
+        particles = new ArrayList<Particle>();
+
         reset();
     }
 
@@ -108,6 +110,7 @@ public class PlayState extends AbstractGameState {
         pulseTimer.update(dt);
         updateAsteroids(dt);
         updateBullets(dt);
+        updateParticles(dt);
     }
 
     private void updateAsteroids(float dt) {
@@ -140,7 +143,7 @@ public class PlayState extends AbstractGameState {
                             break;
                     }
                     bulletIterator.remove();
-                    asteroidIterator.remove();
+                    destroyAsteroid(asteroidIterator, asteroid);
                     asteroidFound = true;
                 }
             }
@@ -157,10 +160,34 @@ public class PlayState extends AbstractGameState {
         asteroidsToAdd.clear();
     }
 
+    private void updateParticles(float dt) {
+        Iterator<Particle> particleIterator = particles.iterator();
+        while(particleIterator.hasNext()) {
+            Particle particle = particleIterator.next();
+            particle.update(dt);
+            if(particle.shouldRemove()) {
+                particleIterator.remove();
+            }
+        }
+    }
+
+    private void destroyAsteroid(Iterator<Asteroid> asteroidIterator, Asteroid asteroid) {
+        Asteroids.content.playSound(ContentManager.SoundEffect.EXPLODE);
+        addParticles(asteroid, ASTEROID_EXPLODE_PARTICLES);
+        asteroidIterator.remove();
+    }
+
+    private void addParticles(AbstractEntity entity, int amount) {
+        for (int i = 0; i < amount; i++) {
+            particles.add(new Particle(entity));
+        }
+    }
+
     private void reset() {
         ship.reset();
         asteroids.clear();
         bullets.clear();
+        particles.clear();
         for (int i = 0; i < INITIAL_ASTEROIDS; i++) {
             float x = MyHelpers.choose(
                     MathUtils.random(Asteroids.WORLD_WIDTH * 0.3333f),
@@ -181,6 +208,9 @@ public class PlayState extends AbstractGameState {
         sr.setProjectionMatrix(viewport.getCamera().combined);
         for (Star star : stars) {
             star.draw(dt, sr);
+        }
+        for (Particle particle : particles) {
+            particle.draw(dt, sr);
         }
         for (Asteroid asteroid : asteroids) {
             asteroid.draw(dt, sr);
