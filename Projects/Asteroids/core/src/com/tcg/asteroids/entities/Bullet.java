@@ -35,6 +35,10 @@ public class Bullet extends AbstractEntity {
         this.setShape();
     }
 
+    public boolean isType(BulletType type) {
+        return this.bulletType.equals(type);
+    }
+
     @Override
     protected void setShape() {
         setSquare();

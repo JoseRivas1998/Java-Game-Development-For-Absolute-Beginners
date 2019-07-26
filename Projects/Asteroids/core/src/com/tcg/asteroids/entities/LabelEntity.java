@@ -31,33 +31,37 @@ public class LabelEntity {
     private Rectangle bounds;
 
     public LabelEntity() {
-        this.text = "";
+        this("");
+    }
+
+    public LabelEntity(String text) {
+        this.text = text;
         textPos = new Vector2();
         this.bounds = new Rectangle();
         align = TOP_LEFT;
     }
 
-    public void update(float dt) {
+    public void update() {
         this.bounds.setWidth(Asteroids.content.getWidth(font, this.text));
         this.bounds.setHeight(Asteroids.content.getHeight(font, this.text));
         if ((align & LEFT) != 0) {
-            textPos.x = this.bounds.getX();
+            textPos.x = getX();
         } else if ((align & CENTER) != 0) {
-            textPos.x = this.bounds.getX() - (this.bounds.getWidth() * .5f);
+            textPos.x = getX() - (getWidth() * .5f);
         } else if ((align & RIGHT) != 0) {
-            textPos.x = this.bounds.getX() - this.bounds.getWidth();
+            textPos.x = getX() - getWidth();
         }
         if ((align & TOP) != 0) {
-            textPos.y = this.bounds.getY();
+            textPos.y = getY();
         } else if ((align & MIDDLE) != 0) {
-            textPos.y = this.bounds.getY() + (this.bounds.getHeight() * .5f);
+            textPos.y = getY() + (getHeight() * .5f);
         } else if ((align & BOTTOM) != 0) {
-            textPos.y = this.bounds.getY() + this.bounds.getHeight();
+            textPos.y = getY() + getHeight();
         }
     }
 
 
-    public void draw(float dt, SpriteBatch sb, ShapeRenderer sr) {
+    public void draw(SpriteBatch sb) {
         Asteroids.content.getFont(font).draw(sb, this.text, textPos.x, textPos.y);
     }
 
@@ -71,6 +75,44 @@ public class LabelEntity {
 
     public void setText(String text) {
         this.text = text;
+    }
+
+    public float getX() {
+        return this.bounds.x;
+    }
+
+    public void setX(float x) {
+        this.bounds.x = x;
+    }
+
+    public float getY() {
+        return this.bounds.y;
+    }
+
+    public void setY(float y) {
+        this.bounds.y = y;
+    }
+
+    public void setUnder(LabelEntity other, float padding) {
+        setX(other.getX());
+        setY(other.getY() - other.getHeight() - padding);
+    }
+
+    public void setPosition(float x, float y) {
+        setX(x);
+        setY(y);
+    }
+
+    public void setPosition(Vector2 point) {
+        setPosition(point.x, point.y);
+    }
+
+    public float getWidth() {
+        return this.bounds.width;
+    }
+
+    public float getHeight() {
+        return this.bounds.height;
     }
 
 }

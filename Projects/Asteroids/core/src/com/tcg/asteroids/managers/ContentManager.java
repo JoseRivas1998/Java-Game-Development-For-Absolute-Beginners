@@ -16,40 +16,24 @@ import java.util.Map;
 public class ContentManager implements Disposable {
 
     public enum Font {
-        ;
+        MAIN("fnt/hyperspace_bold.ttf", 24, Color.WHITE),
+        GAME_OVER("fnt/hyperspace_bold.ttf", 56, Color.RED),
+        WIN("fnt/hyperspace_bold.ttf", 56, Color.LIME),
+        TITLE("fnt/hyperspace_bold.ttf", 56, Color.YELLOW);;
         public final String path;
         public final int fontSize;
         public final Color fontColor;
-        public final float borderWidth;
-        public final Color borderColor;
-        public final int shadowOffsetX;
-        public final int shadowOffsetY;
-        public final Color shadowColor;
 
-        Font(String path, int fontSize, Color fontColor, float borderWidth, Color borderColor, int shadowOffsetX, int shadowOffsetY, Color shadowColor) {
+        Font(String path, int fontSize, Color fontColor) {
             this.path = path;
             this.fontSize = fontSize;
             this.fontColor = fontColor;
-            this.borderWidth = borderWidth;
-            this.borderColor = borderColor;
-            this.shadowOffsetX = shadowOffsetX;
-            this.shadowOffsetY = shadowOffsetY;
-            this.shadowColor = shadowColor;
         }
 
         public FreeTypeFontGenerator.FreeTypeFontParameter toParam() {
             FreeTypeFontGenerator.FreeTypeFontParameter param = new FreeTypeFontGenerator.FreeTypeFontParameter();
             param.size = this.fontSize;
             param.color = this.fontColor;
-            if (this.borderWidth > 0) {
-                param.borderWidth = this.borderWidth;
-                param.borderColor = this.borderColor;
-            }
-            if (this.shadowOffsetX > 0 || this.shadowOffsetY > 0) {
-                param.shadowOffsetX = this.shadowOffsetX;
-                param.shadowOffsetY = this.shadowOffsetY;
-                param.shadowColor = this.shadowColor;
-            }
             return param;
         }
 
