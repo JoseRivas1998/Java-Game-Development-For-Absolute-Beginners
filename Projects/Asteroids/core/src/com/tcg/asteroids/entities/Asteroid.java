@@ -59,7 +59,7 @@ public class Asteroid extends AbstractEntity {
     }
 
     public Asteroid(float x, float y) {
-        this(x, y, MyHelpers.choose(AsteroidType.SMALL, AsteroidType.MEDIUM, AsteroidType.LARGE));
+        this(x, y, MyHelpers.choose(AsteroidType.class));
     }
 
     public AsteroidType getAsteroidType() {

@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.tcg.asteroids.managers.ContentManager;
 
 public final class MyHelpers {
 
@@ -53,6 +54,10 @@ public final class MyHelpers {
 
     public static <T> T choose(T... choices) {
         return choices[MathUtils.random(choices.length - 1)];
+    }
+
+    public static <T extends Enum<T>> T choose(Class<T> enumClass) {
+        return choose(enumClass.getEnumConstants());
     }
 
     public static TextureRegion[][] splitSpriteSheet(Texture texture, int rows, int cols) {
