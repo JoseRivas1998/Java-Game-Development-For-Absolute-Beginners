@@ -229,6 +229,10 @@ public abstract class AbstractEntity {
         return b;
     }
 
+    protected Vector2 getVertex(int index) {
+        return new Vector2(this.vertices[index]);
+    }
+
     @Override
     public int hashCode() {
         return this.id;

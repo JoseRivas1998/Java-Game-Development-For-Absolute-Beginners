@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.tcg.asteroids.Asteroids;
@@ -38,6 +39,11 @@ public class PlayState extends AbstractGameState {
     public static final int SHIP_EXPLODE_PARTICLES = 25;
     private static final float PULSE_TIME = 0.75f;
 
+    public static final float ENEMY_MIN_SPAWN_TIME = 1.0f;
+    public static final float ENEMY_MAX_SPAWN_TIME = 5.0f;
+    public static final float ENEMY_MIN_SHOOT_TIME = 1.0f;
+    public static final float ENEMY_MAX_SHOOT_TIME = 2.0f;
+
     private Viewport viewport;
     private Ship ship;
     private boolean shipAlive;
@@ -59,6 +65,10 @@ public class PlayState extends AbstractGameState {
     private int lives;
     private HUD hud;
 
+    private EnemyContainer enemyContainer;
+    private Timer enemySpawner;
+    private Timer enemyShooter;
+
     public PlayState(GameStateManager gsm) {
         super(gsm);
     }
@@ -71,7 +81,7 @@ public class PlayState extends AbstractGameState {
         shipRespawnTimer.setTimerEvent(new TimerEvent() {
             @Override
             public void accept(Timer timer) {
-                if(lives <= 0) {
+                if (lives <= 0) {
                     Gdx.app.exit();
                 } else {
                     reset();
@@ -123,12 +133,46 @@ public class PlayState extends AbstractGameState {
         score = INITIAL_SCORE;
         lives = INITIAL_LIVES;
 
+        enemyContainer = new EnemyContainer();
+        enemySpawner = new Timer(MathUtils.random(ENEMY_MIN_SPAWN_TIME, ENEMY_MAX_SPAWN_TIME), Timer.TimerType.RUN_CONTINUOUS);
+        enemySpawner.setTimerEvent(new TimerEvent() {
+            @Override
+            public void accept(Timer timer) {
+                timer.setTime(MathUtils.random(ENEMY_MIN_SPAWN_TIME, ENEMY_MAX_SPAWN_TIME));
+                enemyContainer.activateEnemy();
+            }
+        });
+
+        enemyShooter = new Timer(MathUtils.random(ENEMY_MIN_SHOOT_TIME, ENEMY_MAX_SHOOT_TIME), Timer.TimerType.RUN_CONTINUOUS);
+        enemyShooter.setTimerEvent(new TimerEvent() {
+            @Override
+            public void accept(Timer timer) {
+                timer.setTime(MathUtils.random(ENEMY_MIN_SHOOT_TIME, ENEMY_MAX_SHOOT_TIME));
+                if(enemyContainer.isEnemyActive()) {
+                    Asteroids.content.playSound(ContentManager.SoundEffect.SAUCER_SHOOT);
+                    Vector2 enemyPos = enemyContainer.getEnemyPosition();
+                    float angle = 0.0f;
+                    switch(enemyContainer.getEnemyType()) {
+                        case SMALL:
+                            angle = MathUtils.random(MathUtils.PI2);
+                            break;
+                        case LARGE:
+                            float dX = ship.getX() - enemyPos.x;
+                            float dY = ship.getY() - enemyPos.y;
+                            angle = MathUtils.atan2(dY, dX);
+                            break;
+                    }
+                    bullets.add(new Bullet(enemyPos, angle, Bullet.BulletType.ENEMY));
+                }
+            }
+        });
+
         reset();
     }
 
     @Override
     public void handleInput(float dt) {
-        if(shipAlive) {
+        if (shipAlive) {
             ship.handleInput(dt);
         }
         if (MyInput.keyCheckPressed(MyInput.SHOOT)) {
@@ -140,10 +184,15 @@ public class PlayState extends AbstractGameState {
     @Override
     public void update(float dt) {
         viewport.apply(true);
-        if(shipAlive) {
+        if (shipAlive) {
             ship.update(dt);
         } else {
             shipRespawnTimer.update(dt);
+        }
+        if (enemyContainer.isEnemyActive()) {
+            updateEnemy(dt);
+        } else {
+            enemySpawner.update(dt);
         }
         asteroidSpawner.update(dt);
         pulseTimer.update(dt);
@@ -151,15 +200,43 @@ public class PlayState extends AbstractGameState {
         updateBullets(dt);
         updateParticles(dt);
         hud.update(score, lives, shipAlive ? ship.getSpeed() : 0f);
-        if(shipAlive && score >= SCORE_TO_WIN) {
+        if (shipAlive && score >= SCORE_TO_WIN) {
             Gdx.app.exit();
         }
+    }
+
+    private void updateEnemy(float dt) {
+        enemyContainer.updateEnemy(dt);
+        if (shipAlive && enemyContainer.enemyCollidingWith(ship)) {
+            destroyShip();
+            destroyEnemy();
+            return;
+        }
+        enemyShooter.update(dt);
+        float enemyX = enemyContainer.getEnemyX();
+        if (enemyX < 0 || enemyX > Asteroids.WORLD_WIDTH) {
+            enemyContainer.deactivateEnemy();
+            Asteroids.content.stopSound(ContentManager.SoundEffect.LARGE_ENEMY);
+            Asteroids.content.stopSound(ContentManager.SoundEffect.SMALL_ENEMY);
+            enemyShooter.reset();
+        }
+    }
+
+    private void destroyEnemy() {
+        Enemy enemy = enemyContainer.deactivateEnemy();
+        addParticles(enemy, SHIP_EXPLODE_PARTICLES);
+        Asteroids.content.playSound(ContentManager.SoundEffect.EXPLODE);
+        enemySpawner.reset();
+        enemyShooter.reset();
+        Asteroids.content.stopSound(ContentManager.SoundEffect.LARGE_ENEMY);
+        Asteroids.content.stopSound(ContentManager.SoundEffect.SMALL_ENEMY);
+        score += SCORE_PER_ENEMY;
     }
 
     private void updateAsteroids(float dt) {
         for (Asteroid asteroid : asteroids) {
             asteroid.update(dt);
-            if(asteroid.collidingWith(ship) && shipAlive) {
+            if (asteroid.collidingWith(ship) && shipAlive) {
                 destroyShip();
             }
         }
@@ -171,6 +248,25 @@ public class PlayState extends AbstractGameState {
         while (bulletIterator.hasNext()) {
             Bullet bullet = bulletIterator.next();
             bullet.update(dt);
+            if (bullet.getX() <= 0 ||
+                    bullet.getX() >= Asteroids.WORLD_WIDTH ||
+                    bullet.getY() <= 0 ||
+                    bullet.getY() >= Asteroids.WORLD_HEIGHT) {
+                bulletIterator.remove();
+                continue;
+            }
+            if (ship.collidingWith(bullet) && bullet.isType(Bullet.BulletType.ENEMY) && shipAlive) {
+                destroyShip();
+                bulletIterator.remove();
+                continue;
+            }
+            if (enemyContainer.isEnemyActive()) {
+                if(enemyContainer.enemyCollidingWith(bullet) && bullet.isType(Bullet.BulletType.PLAYER)) {
+                    destroyEnemy();
+                    bulletIterator.remove();
+                    continue;
+                }
+            }
             Iterator<Asteroid> asteroidIterator = asteroids.iterator();
             boolean asteroidFound = false;
             while (asteroidIterator.hasNext() && !asteroidFound) {
@@ -188,7 +284,7 @@ public class PlayState extends AbstractGameState {
                         case SMALL:
                             break;
                     }
-                    if(bullet.isType(Bullet.BulletType.PLAYER)) {
+                    if (bullet.isType(Bullet.BulletType.PLAYER)) {
                         score += SCORE_PER_ASTEROID;
                     }
                     bulletIterator.remove();
@@ -196,7 +292,7 @@ public class PlayState extends AbstractGameState {
                     asteroidFound = true;
                 }
             }
-            if(!asteroidFound) {
+            if (!asteroidFound) {
                 if (bullet.getX() < 0 || bullet.getX() > Asteroids.WORLD_WIDTH ||
                         bullet.getY() < 0 || bullet.getY() > Asteroids.WORLD_HEIGHT) {
                     bulletIterator.remove();
@@ -211,10 +307,10 @@ public class PlayState extends AbstractGameState {
 
     private void updateParticles(float dt) {
         Iterator<Particle> particleIterator = particles.iterator();
-        while(particleIterator.hasNext()) {
+        while (particleIterator.hasNext()) {
             Particle particle = particleIterator.next();
             particle.update(dt);
-            if(particle.shouldRemove()) {
+            if (particle.shouldRemove()) {
                 particleIterator.remove();
             }
         }
@@ -242,11 +338,14 @@ public class PlayState extends AbstractGameState {
     }
 
     private void reset() {
+        Asteroids.content.stopSound(ContentManager.SoundEffect.LARGE_ENEMY);
+        Asteroids.content.stopSound(ContentManager.SoundEffect.SMALL_ENEMY);
         ship.reset();
         asteroids.clear();
         bullets.clear();
         particles.clear();
         shipAlive = true;
+        if(enemyContainer.isEnemyActive()) enemyContainer.deactivateEnemy();
         for (int i = 0; i < INITIAL_ASTEROIDS; i++) {
             float x = MyHelpers.choose(
                     MathUtils.random(Asteroids.WORLD_WIDTH * 0.3333f),
@@ -259,6 +358,7 @@ public class PlayState extends AbstractGameState {
             asteroids.add(new Asteroid(x, y));
         }
         asteroidSpawner.reset();
+        enemySpawner.reset();
     }
 
     @Override
@@ -277,7 +377,10 @@ public class PlayState extends AbstractGameState {
         for (Bullet bullet : bullets) {
             bullet.draw(dt, sr);
         }
-        if(shipAlive) {
+        if(enemyContainer.isEnemyActive()) {
+            enemyContainer.drawEnemy(dt, sr);
+        }
+        if (shipAlive) {
             ship.draw(dt, sr);
         }
         sr.end();
