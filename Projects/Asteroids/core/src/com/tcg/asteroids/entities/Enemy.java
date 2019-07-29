@@ -46,7 +46,7 @@ public class Enemy extends AbstractEntity {
             originalPosition.x = Asteroids.WORLD_WIDTH;
         }
         originalPosition.y = MathUtils.random((float) Asteroids.WORLD_HEIGHT);
-        goUp = originalPosition.y < Asteroids.WORLD_WIDTH * 0.5f;
+        goUp = originalPosition.y < Asteroids.WORLD_HEIGHT * 0.5f;
         setPosition(originalPosition);
         this.initializeVertices(6);
         setRadius(type.radius);
