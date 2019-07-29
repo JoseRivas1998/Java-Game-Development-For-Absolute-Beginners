@@ -154,7 +154,7 @@ public class ContentManager implements Disposable {
         sounds.get(soundEffect).stop();
     }
 
-    public void stopAllSound(SoundEffect soundEffect) {
+    public void stopAllSound() {
         for (SoundEffect value : SoundEffect.values()) {
             stopSound(value);
         }

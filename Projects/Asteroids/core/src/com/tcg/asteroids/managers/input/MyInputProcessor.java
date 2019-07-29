@@ -33,6 +33,14 @@ public class MyInputProcessor extends InputAdapter {
             MyInput.setKey(MyInput.SHOOT, value);
             keyFound = true;
         }
+        if(keycode == Input.Keys.ENTER) {
+            MyInput.setKey(MyInput.ENTER, value);
+            keyFound = true;
+        }
+        if(keycode == Input.Keys.ESCAPE) {
+            MyInput.setKey(MyInput.ESCAPE, value);
+            keyFound = true;
+        }
         return keyFound;
     }
 

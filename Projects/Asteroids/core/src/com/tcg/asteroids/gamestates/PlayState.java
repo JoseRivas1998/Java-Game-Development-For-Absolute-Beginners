@@ -82,7 +82,7 @@ public class PlayState extends AbstractGameState {
             @Override
             public void accept(Timer timer) {
                 if (lives <= 0) {
-                    Gdx.app.exit();
+                    switchState(GameStateType.GAME_OVER);
                 } else {
                     reset();
                 }
@@ -201,7 +201,7 @@ public class PlayState extends AbstractGameState {
         updateParticles(dt);
         hud.update(score, lives, shipAlive ? ship.getSpeed() : 0f);
         if (shipAlive && score >= SCORE_TO_WIN) {
-            Gdx.app.exit();
+            switchState(GameStateType.WIN);
         }
     }
 

@@ -22,7 +22,7 @@ public class Asteroids extends ApplicationAdapter {
 	@Override
 	public void create () {
 		content = new ContentManager();
-		gsm = new GameStateManager(GameStateType.PLAY);
+		gsm = new GameStateManager(GameStateType.TITLE);
 		Gdx.input.setInputProcessor(new MyInputProcessor());
 	}
 
